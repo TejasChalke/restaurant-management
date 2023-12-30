@@ -4,6 +4,11 @@
     justify-content: flex-start;
     align-items: center;
     padding: 1rem;
+    width: 20%;
+    position: fixed;
+    height: 100vh;
+    background-color: var(--bg-primary);
+    color: var(--primary-color);
 
     #title{
         font-size: 2rem;
@@ -23,11 +28,10 @@
         padding: .5rem .75rem;
 
         &:hover{
-            background-color: var(--bg-secondary);
+            background-color: var(--bg-tertiary);
         }
         
         &.active{
-            color: var(--secondary-color);
             background-color: var(--bg-secondary);
         }
     }

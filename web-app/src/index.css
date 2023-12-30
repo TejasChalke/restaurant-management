@@ -10,8 +10,14 @@
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 
-  --bg-primary: #121316;
-  --bg-secondary: #2a2b2e;
+  --bg-primary: #211c19;
+  --bg-secondary: #f56d21;
+  --bg-tertiary: #2a2b2e;
+
+  --bg-green: #dcfce7;
+  --color-green: #1edd60;
+
   --primary-color: whitesmoke;
-  --secondary-color: rgb(96, 249, 76);
+  --secondary-color: black;
+  --tertiary-color: #f56d21;
 }

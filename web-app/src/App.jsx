@@ -1,19 +1,26 @@
+import { useState } from 'react';
 import './App.scss';
 import Main from './components/main/Main';
 import Sidebar from './components/sidebar/Sidebar';
+import Tables from './components/tabs/tables/Tables';
+import { ComponentDisplayContext } from './contexts/ComponentDisplayContext';
 
 function App() {
+  const [componentDisplayType, setComponentDisplayType] = useState(<Tables />);
+
   return (
     <div className="App">
-      <Sidebar />
-      <Main />
+      <ComponentDisplayContext.Provider value={{componentDisplayType, setComponentDisplayType}}>
+        <Sidebar />
+        <Main />
+      </ComponentDisplayContext.Provider>
     </div>
   );
 }
 
 export default App;
 
-// https://dribbble.com/shots/19061261-CosyPOS-restaurant-POS-system
+// https://dribbble.com/shots/22643265-Admin-Dashboard?utm_source=Clipboard_Shot&utm_campaign=ismailkhan1122&utm_content=Admin%20Dashboard&utm_medium=Social_Share&utm_source=Clipboard_Shot&utm_campaign=ismailkhan1122&utm_content=Admin%20Dashboard&utm_medium=Social_Share
 
 // tables (tab):
 //  can be occupied, free
