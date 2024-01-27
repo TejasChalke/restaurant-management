@@ -1,0 +1,90 @@
+@mixin box-shadow {
+    -webkit-box-shadow: 0px 0px 3px 3px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0px 0px 3px 3px rgba(0,0,0,0.2);
+    box-shadow: 0px 0px 3px 3px rgba(0,0,0,0.2);
+}
+
+#reservationContainer{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    min-height: 100vh;
+
+    #reservationsGrid{
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem 3rem;
+
+        .reservationItem{
+            @include box-shadow();
+
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+
+            background-color: var(--bg-purple);
+            padding: 1rem;
+            border-radius: 4px;
+
+            &.registered{
+                background-color: var(--bg-green);
+
+                .reservationItem-title {
+                    i {
+                        color: var(--color-green);
+                    }
+                }
+            }
+
+            .reservationItem-title{
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: flex-start;
+
+                margin-bottom: 1rem;
+                font-weight: bold;
+                font-size: 1.5rem;
+
+                i {
+                    color: var(--color-purple);
+                    margin-right: .5rem;
+                }
+
+                .reservationItem-subheader{
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    font-size: 1rem;
+                }
+            }
+
+            .reservationItem-buttons{
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .reservationItem-button{
+                    background-color: var(--color-green);
+                    max-width: 40%;
+                    color: white;
+                    padding: .5rem 1.25rem;
+                    font-size: 1.2rems;
+                    border-radius: 10px;
+                    text-align: center;
+                    cursor: pointer;
+
+                    &.red{
+                        background-color: var(--color-red);
+                    }
+                }
+            }
+        }
+    }
+}

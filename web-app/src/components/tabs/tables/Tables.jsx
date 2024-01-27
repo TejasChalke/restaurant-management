@@ -48,6 +48,7 @@ export default function Tables(){
     }
 
     function changeTableDataInLocalStorage(temp){
+        if(temp === null || temp === undefined || temp.length === 0) return;
         localStorage.setItem("tableData", JSON.stringify(temp));
     }
 
