@@ -33,7 +33,7 @@ export default function Reservation(){
             <div className="tabTitle">
                 <span>Reservations</span>
                 <i
-                    className="fa-solid fa-trash-arrow-up"
+                    className="fa-solid fa-rotate"
                     onClick={removeOldReservations}
                     title='update reservations'
                 ></i>

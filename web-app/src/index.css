@@ -10,6 +10,8 @@
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 
+  --button-border-radius: 4px;
+
   --bg-primary: #211c19;
   --bg-secondary: #f56d21;
   --bg-tertiary: #2a2b2e;

@@ -1,0 +1,123 @@
+@mixin box-shadow {
+    -webkit-box-shadow: 0px 0px 3px 3px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0px 0px 3px 3px rgba(0,0,0,0.2);
+    box-shadow: 0px 0px 3px 3px rgba(0,0,0,0.2);
+}
+
+#menuContainer{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    min-height: 100vh;
+
+    #menuGrid{
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem 3rem;
+
+        .menuItem{
+            @include box-shadow();
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+
+            background-color: var(--bg-green);
+            padding: 1rem;
+            border-radius: 4px;
+
+            &.hidden{
+                background-color: var(--bg-pink);
+            }
+
+            img{
+                aspect-ratio: 4/3;
+                width: 100%;
+                object-fit: cover;
+                border-radius: inherit;
+                margin-bottom: .5rem;
+            }
+
+            .menuItem-big{
+                font-size: 1.8rem;
+                font-weight: 500;
+                margin-bottom: .5rem;
+            }
+
+            .menuItem-small{
+                font-size: .8rem;
+                margin-bottom: .5rem;
+            }
+
+            .menuItem-buttons{
+                width: 100%;
+                display: grid;
+                gap: 1rem 1rem;
+                grid-template-columns: 1fr 1fr;
+
+                .menuItem-button{
+                    background-color: var(--color-green);
+                    width: 100%;
+                    color: white;
+                    padding: .5rem 1.25rem;
+                    font-size: 1.2rems;
+                    border-radius: var(--button-border-radius);
+                    text-align: center;
+                    cursor: pointer;
+
+                    &.red{
+                        background-color: var(--color-red);
+                    }
+                }
+            }
+        }
+    }
+
+    #menuEditForm{
+        position: absolute;
+        width: 75vw;
+        height: 95vh;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        background-color: var(--primary-color);
+        border-radius: 10px;
+        border: 1px solid black;
+        padding: 1rem;
+        
+        #menuEditForm-title{
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        input{
+            font-size: 1.5rem;
+            width: 100%;
+            margin: .5rem 0;
+            padding: .5rem .75rem;
+        }
+
+        #menuEditForm-buttons{
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: 1rem;
+
+            .menuEditForm-button{
+                font-size: 2rem;
+                margin-right: 1rem;
+                padding: .5rem 1rem;
+                background-color: var(--color-green);
+                color: white;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+        }
+    }
+}

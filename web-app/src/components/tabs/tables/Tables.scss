@@ -58,7 +58,7 @@
                     color: white;
                     padding: .5rem 1.25rem;
                     font-size: 1.2rems;
-                    border-radius: 10px;
+                    border-radius: var(--button-border-radius);
                     text-align: center;
                     cursor: pointer;
                 }
