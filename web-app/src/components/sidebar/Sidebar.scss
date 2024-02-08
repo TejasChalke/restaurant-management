@@ -22,7 +22,7 @@
     .sidebar-item{
         width: 100%;
         font-size: 1.5rem;
-        border-radius: 10px;
+        border-radius: var(--button-border-radius);
         cursor: pointer;
         margin-bottom: 1rem;
         padding: .5rem .75rem;
