@@ -17,7 +17,8 @@ export default function Reservation(){
                 customerName: "John Doe",
                 customerId: Math.random() > 0.4 ? i : 0,
                 dateTime: currDate.split("-").reverse().join("/") + " " + currTime + ":" + (currMin < 10 ? "0" + currMin : currMin),
-                status: (i === 2 || i === 5) ? "pending" : "approved"
+                status: (i === 2 || i === 5) ? "pending" : "approved",
+                seats: Math.ceil(Math.random() * 6)
             })
         }
         
@@ -48,7 +49,7 @@ export default function Reservation(){
                                 <div className="reservationItem-title">
                                     <div className='reservationItem-header'>
                                         {reservation.customerId !== 0 && <i className="fa-solid fa-user"></i>}
-                                        <span>{reservation.customerName}</span>
+                                        <span>{reservation.customerName} ({reservation.seats})</span>
                                     </div>
                                     <div className='reservationItem-subheader'>
                                         <span>Date: {currDateTime[0]}</span>

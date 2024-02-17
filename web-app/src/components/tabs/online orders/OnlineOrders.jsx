@@ -9,7 +9,9 @@ const data =
         "contact": "+1 123-456-7890",
         "address": "123 Main Street, Cityville, State, Zip"
         },
+        "time": "15:33",
         "status": "pending",
+        "total": 57,
         "items": [
         {"dish": "Butter Chicken", "quantity": 2, "price": "$12.99"},
         {"dish": "Biryani", "quantity": 1, "price": "$14.99"}
@@ -21,7 +23,9 @@ const data =
         "contact": "+1 234-567-8901",
         "address": "456 Oak Avenue, Townsville, State, Zip"
         },
+        "time": "15:33",
         "status": "pending",
+        "total": 57,
         "items": [
         {"dish": "Masala Dosa", "quantity": 3, "price": "$8.99"},
         {"dish": "Chole Bhature", "quantity": 1, "price": "$10.99"}
@@ -33,7 +37,9 @@ const data =
         "contact": "+1 345-678-9012",
         "address": "789 Pine Street, Villagetown, State, Zip"
         },
+        "time": "15:33",
         "status": "pending",
+        "total": 57,
         "items": [
         {"dish": "Rogan Josh", "quantity": 2, "price": "$13.99"},
         {"dish": "Samosa", "quantity": 4, "price": "$2.99"}
@@ -45,7 +51,9 @@ const data =
         "contact": "+1 456-789-0123",
         "address": "101 Maple Lane, Hamletville, State, Zip"
         },
+        "time": "15:33",
         "status": "pending",
+        "total": 57,
         "items": [
         {"dish": "Chicken Tikka Masala", "quantity": 1, "price": "$11.99"},
         {"dish": "Dhokla", "quantity": 2, "price": "$6.99"}
@@ -57,7 +65,9 @@ const data =
         "contact": "+1 567-890-1234",
         "address": "202 Elm Street, Riverside, State, Zip"
         },
+        "time": "15:33",
         "status": "pending",
+        "total": 57,
         "items": [
         {"dish": "Paneer Tikka", "quantity": 2, "price": "$9.99"},
         {"dish": "Aloo Paratha", "quantity": 2, "price": "$7.99"}
@@ -69,7 +79,9 @@ const data =
         "contact": "+1 678-901-2345",
         "address": "303 Cedar Avenue, Lakeside, State, Zip"
         },
+        "time": "15:33",
         "status": "pending",
+        "total": 57,
         "items": [
         {"dish": "Butter Chicken", "quantity": 1, "price": "$12.99"},
         {"dish": "Biryani", "quantity": 1, "price": "$14.99"}
@@ -81,7 +93,9 @@ const data =
         "contact": "+1 789-012-3456",
         "address": "404 Birch Street, Mountainview, State, Zip"
         },
+        "time": "15:33",
         "status": "pending",
+        "total": 57,
         "items": [
         {"dish": "Masala Dosa", "quantity": 1, "price": "$8.99"},
         {"dish": "Chole Bhature", "quantity": 3, "price": "$10.99"}
@@ -93,7 +107,9 @@ const data =
         "contact": "+1 890-123-4567",
         "address": "505 Oak Lane, Hillside, State, Zip"
         },
+        "time": "15:33",
         "status": "pending",
+        "total": 57,
         "items": [
         {"dish": "Rogan Josh", "quantity": 2, "price": "$13.99"},
         {"dish": "Samosa", "quantity": 2, "price": "$2.99"}
@@ -105,7 +121,9 @@ const data =
         "contact": "+1 901-234-5678",
         "address": "606 Pine Avenue, Seaside, State, Zip"
         },
+        "time": "15:33",
         "status": "pending",
+        "total": 57,
         "items": [
         {"dish": "Chicken Tikka Masala", "quantity": 2, "price": "$11.99"},
         {"dish": "Dhokla", "quantity": 1, "price": "$6.99"}
@@ -117,7 +135,9 @@ const data =
         "contact": "+1 012-345-6789",
         "address": "707 Maple Street, Cityside, State, Zip"
         },
+        "time": "15:33",
         "status": "pending",
+        "total": 57,
         "items": [
         {"dish": "Paneer Tikka", "quantity": 3, "price": "$9.99"},
         {"dish": "Aloo Paratha", "quantity": 1, "price": "$7.99"}
@@ -156,12 +176,6 @@ export default function OnlineOrders(){
             <div id="ordersGrid">
                 {
                     orders?.map((order, index) => {
-                        var total = 0;
-                        order.items.forEach(element => {
-                            var price = element.price.substring(1)
-                            total += parseFloat(price)
-                        })
-
                         return(
                             <div className="orderItem" key={index}>
                                 <div className="orderItem-header">
@@ -195,9 +209,12 @@ export default function OnlineOrders(){
                                         }
                                         <li className='medium'>
                                             <span>Total: </span>
-                                            <span>${total}</span>
+                                            <span>${order.total}</span>
                                         </li>
                                     </ul>
+                                </div>
+                                <div className="orderItem-time">
+                                    Time: {order.time}
                                 </div>
                                 {
                                     order.status === "pending" ? 

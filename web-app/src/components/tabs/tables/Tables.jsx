@@ -98,7 +98,7 @@ export default function Tables(){
                                         <>
                                             <div
                                                 className="button"
-                                            >Add Items</div>
+                                            >Edit Items</div>
                                             <div
                                                 className="button"
                                                 onClick={() => changeTableState(idx, "available")}
