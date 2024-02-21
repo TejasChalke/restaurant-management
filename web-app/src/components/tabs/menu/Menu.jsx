@@ -154,27 +154,29 @@ export default function Menu(){
         }
     }, [showForm, fieldsSet, dishes])
 
-    function hideItem(index){
-        setDishes(prev => {
-            var temp = [...prev]
-            temp[index].status = "hidden"
-            return temp
-        })
-    }
-
-    function showItem(index){
-        setDishes(prev => {
-            var temp = [...prev]
-            temp[index].status = "available"
-            return temp
-        })
-    }
-
     function prepareForm(index){
         setShowForm(true);
         setFieldsSet({
             status: false,
             index: index
+        })
+    }
+
+    async function changeDishStatus(index, newStatus){
+        var newData = {
+            status: newStatus,
+            id: dishes[index].id
+        }
+        
+        const updateStatus = await updateDishesData(newData);
+        if(updateStatus === "failed"){
+            return
+        }
+
+        setDishes(prev => {
+            var temp = [...prev]
+            temp[index].status = newStatus
+            return temp
         })
     }
 
@@ -222,9 +224,18 @@ export default function Menu(){
                 {
                     dishes.map((dish, index) => {
                         const currClassName = dish.status === "hidden" ? "menuItem hidden" : "menuItem";
+                        const imageClassName = dish.status === "sold out" ? "filter" : "";
                         return(
                             <div key={index} className={currClassName}>
-                                <img src={dish.image} alt="" />
+                                <div className="menuItem-imageContainer">
+                                    {
+                                        dish.status === "sold out" &&
+                                        <div className="soldOut-overlay">
+                                            Sold Out!
+                                        </div>
+                                    }
+                                    <img className={imageClassName} src={dish.image} alt="" />
+                                </div>
                                 <div className="menuItem-big">
                                     {dish.name}
                                 </div>
@@ -236,19 +247,28 @@ export default function Menu(){
                                 </div>
 
                                 <div className="menuItem-buttons">
-                                    <div className="menuItem-button">
-                                        Sold out
-                                    </div>
+                                    {
+                                        dish.status !== "sold out" && dish.status !== "hidden" && 
+                                        <div className="menuItem-button" onClick={() => changeDishStatus(index, "sold out")}>
+                                            Sold out
+                                        </div>
+                                    }
+                                    {
+                                        dish.status === "sold out" && 
+                                        <div className="menuItem-button" onClick={() => changeDishStatus(index, "available")}>
+                                            Available
+                                        </div>
+                                    }
 
                                     {
-                                        dish.status !== "hidden" && 
-                                        <div className="menuItem-button" onClick={() => hideItem(index)}>
+                                        dish.status !== "sold out" && dish.status !== "hidden" && 
+                                        <div className="menuItem-button" onClick={() => changeDishStatus(index, "hidden")}>
                                             Hide
                                         </div>
                                     }
                                     {
                                         dish.status === "hidden" && 
-                                        <div className="menuItem-button" onClick={() => showItem(index)}>
+                                        <div className="menuItem-button" onClick={() => changeDishStatus(index, "available")}>
                                             Show
                                         </div>
                                     }

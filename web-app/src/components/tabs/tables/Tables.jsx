@@ -11,7 +11,7 @@ export default function Tables(){
             for(let i=0; i<10; i++){
                 temp.push({
                     number: i+1,
-                    capacity: Math.floor(Math.random() * 4 + 2),
+                    capacity: 4,
                     state: "available"
                 })
             }
@@ -39,7 +39,7 @@ export default function Tables(){
         let temp = [...tables];
         temp.push({
             number: tables.length + 1,
-            capacity: Math.floor(Math.random() * 4 + 2),
+            capacity: 4,
             state: "available"
         })
 

@@ -32,13 +32,34 @@
             &.hidden{
                 background-color: var(--bg-pink);
             }
-
-            img{
-                aspect-ratio: 4/3;
-                width: 100%;
-                object-fit: cover;
+            
+            .menuItem-imageContainer{
                 border-radius: inherit;
-                margin-bottom: .5rem;
+                position: relative;
+
+                .soldOut-overlay{
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: white;
+                    font-size: 1.8rem;
+                    font-weight: 500;
+                    width: max-content;
+                    z-index: 10;
+                }
+                
+                img{
+                    aspect-ratio: 4/3;
+                    width: 100%;
+                    object-fit: cover;
+                    margin-bottom: .5rem;
+                    border-radius: inherit;
+
+                    &.filter{
+                        filter: brightness(50%);
+                    }
+                } 
             }
 
             .menuItem-big{
