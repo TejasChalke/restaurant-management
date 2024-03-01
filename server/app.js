@@ -11,9 +11,11 @@ app.use(express.json());
 
 // routes
 const menuRoutes = require('./routes/menuRoutes');
+const userRoutes = require('./routes/userRoutes')
 
 // using the routes in different files
 app.use('/menu', menuRoutes)
+app.use('/user', userRoutes)
 
 // start the server
 app.listen(port, () => {
