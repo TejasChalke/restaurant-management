@@ -103,7 +103,6 @@ export default function Menu(){
               body: JSON.stringify(newData),
             });
             
-            console.log(response.status)
           
             if (response.status < 200 || response.status > 299) {
               // If the response status is not in the range 200-299

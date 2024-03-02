@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { useNavigate } from "react-router-dom";
 import './Logon.scss'
 
 // load environment variables from .env file
@@ -25,6 +26,52 @@ export default function Logon(){
 }
 
 function Login(props){
+    const navigate = useNavigate();
+    const emailRef = useRef();
+    const passwordRef = useRef();
+
+    async function sendLogInRequest(){
+        const email = emailRef.current.value;
+        const password = passwordRef.current.value;
+
+        const data = {
+            email: email,
+            password: password
+        }
+
+        try{
+            const response = await fetch(SERVER_ADDRESS + "/user/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            })
+            
+            if (response.status < 200 || response.status > 299) {
+                // If the response status is not in the range 200-299
+                console.log(`Error getting user from the database. Status: ${response.status}`);
+            } else {
+                console.log("User details retreived");
+
+                const result = await response.json();
+                navigate("/profile", {
+                    state: result[0]
+                })
+            }
+        }catch (error){
+            // Network error or other exceptions
+            console.error("Error making the API request:", error);
+        }
+
+        resetFields();
+    }
+
+    function resetFields() {
+        emailRef.current.value = "";
+        passwordRef.current.value = "";
+    }
+
     return(
         <div className="internalContainer">
             <div className="title">
@@ -32,8 +79,8 @@ function Login(props){
                 <span className='small'>Sign in to continue</span>
             </div>
             <div className="form">
-                <input type="text" placeholder='Email'/>
-                <input type="password" placeholder='Password'/>
+                <input type="text" placeholder='Email' ref={emailRef}/>
+                <input type="password" placeholder='Password' ref={passwordRef}/>
 
                 <div className="linkContainer">
                     <div className="link">
@@ -49,7 +96,7 @@ function Login(props){
                         Sign Up
                     </div>
                 </div>
-                <div className="button">
+                <div className="button" onClick={sendLogInRequest}>
                     Sign In
                 </div>
             </div>
@@ -63,17 +110,53 @@ function Signup(props){
     const passRef = useRef();
     const confirmRef = useRef();
 
-    function sendSignUpRequest(){
+    async function sendSignUpRequest(){
         const name = nameRef.current.value;
         const email = emailRef.current.value;
-        const password = passRef.current.value;
-        const confirm = confirmRef.current.value;
+        const password = passRef.current.value.trim();
+        const confirm = confirmRef.current.value.trim();
+        if(password !== confirm || invalidPassword(password)) return;
 
-        console.log(name)
-        console.log(email)
-        console.log(password)
-        console.log(confirm)
-        console.log(SERVER_ADDRESS)
+        const data = {
+            name: name,
+            email: email,
+            address: '',
+            contact: '',
+            password: password
+        }
+        
+        try{
+            const response = await fetch(SERVER_ADDRESS + "/user/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            })
+
+            if (response.status < 200 || response.status > 299) {
+                // If the response status is not in the range 200-299
+                console.log(`Error adding user inside the database. Status: ${response.status}`);
+            } else {
+                console.log("User added successfully");
+            }
+        }catch (error){
+            // Network error or other exceptions
+            console.error("Error making the API request:", error);
+        }
+
+        resetFields();
+    }
+
+    function invalidPassword(password){
+        return password.length < 5
+    }
+
+    function resetFields(){
+        nameRef.current.value = "";
+        emailRef.current.value = "";
+        passRef.current.value = "";
+        confirmRef.current.value = "";
     }
 
     return(
