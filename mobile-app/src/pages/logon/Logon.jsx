@@ -1,6 +1,7 @@
-import { useRef, useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import './Logon.scss'
+import { UserDataContext } from '../../contexts/UserDataContext';
 
 // load environment variables from .env file
 const SERVER_ADDRESS = process.env.REACT_APP_SERVER_ADDRESS;
@@ -26,6 +27,7 @@ export default function Logon(){
 }
 
 function Login(props){
+    const {setUserData} = useContext(UserDataContext);
     const navigate = useNavigate();
     const emailRef = useRef();
     const passwordRef = useRef();
@@ -55,9 +57,8 @@ function Login(props){
                 console.log("User details retreived");
 
                 const result = await response.json();
-                navigate("/profile", {
-                    state: result[0]
-                })
+                setUserData(result[0]);
+                navigate("/profile");
             }
         }catch (error){
             // Network error or other exceptions

@@ -1,0 +1,48 @@
+#profileContainer{
+    min-height: 100%;
+    overflow-y: scroll;
+
+    #profileForm{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        padding: 2rem;
+
+        .profileOption{
+            width: 100%;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid black;
+
+            .profileOption-header{
+                width: 100%;
+                font-size: 1.5rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+
+                i{
+                    margin-left: .5rem;
+                    cursor: pointer;
+                }
+            }
+
+            .info{
+                min-height: 1.5rem;
+            }
+        }
+
+        .profileButton{
+            font-size: 1.5rem;
+            padding: .5rem .75rem;
+            margin-top: 2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            background-color: var(--primary-blue);
+        }
+    }
+}

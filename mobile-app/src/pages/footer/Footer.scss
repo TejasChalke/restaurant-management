@@ -1,0 +1,38 @@
+#footerContainer{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    border-top: 1px solid var(--dark-blue);
+    background: var(--primary-blue);
+
+    .footerOption{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        
+        color: whitesmoke;
+        font-size: 2rem;
+        padding: .5rem 0rem;
+
+        cursor: pointer;
+
+        i{
+            cursor: pointer;
+        }
+
+        .small{
+            font-size: .8rem;
+            font-weight: 600;
+        }
+
+        &.selected{
+            color: var(--primary-green);
+        }
+    }
+}
