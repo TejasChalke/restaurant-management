@@ -32,6 +32,7 @@
 
             .info{
                 min-height: 1.5rem;
+                margin-top: .5rem;
             }
         }
 
@@ -43,6 +44,61 @@
             cursor: pointer;
             color: white;
             background-color: var(--primary-blue);
+        }
+    }
+
+    #profileEditForm{
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        
+        width: 90%;
+        height: 50%;
+        z-index: 10;
+        background-color: rgb(64, 109, 116);
+        border-radius: 4px;
+
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 4rem;
+
+        &.active{
+            display: flex;
+        }
+
+        #profileEditTitle{
+            font-size: 2rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        textarea{
+            margin-top: .5rem;
+            font-size: 1.3rem;
+            width: 80%;
+            aspect-ratio: 16/10;
+            padding: .5rem;
+        }
+
+        #profileEditButtons{
+            width: 100%;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            
+            .profileEditButton{
+                font-size: 1.5rem;
+                margin-top: 1rem;
+                
+                border-radius: 4px;
+                padding: .25rem 1rem;
+                color: white;
+                background-color: var(--primary-blue);
+                cursor: pointer;
+            }
         }
     }
 }

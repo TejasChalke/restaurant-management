@@ -68,4 +68,45 @@ router.post('/signup', async (req, res) => {
     }
   });
 
+  
+// API route to update menu item data in MySQL table
+router.put('/update-user', async (req, res) => {
+  const newData = req.body;
+
+  // Check if 'id' is present in the request body
+  if (!newData.id) {
+      return res.status(400).json({ error: 'ID is required in the request body' });
+  }
+  
+  const id = newData.id;
+  delete newData.id; // Remove 'id' from newData to avoid updating it
+  
+  try {
+      // Get a connection from the pool
+      const connection = await pool.getConnection();
+
+      // Construct the SET clause dynamically based on newData keys
+      const setClause = Object.keys(newData).map((key) => `${key} = ?`).join(', ');
+
+      // Update the MySQL table based on the received data and id
+      const [result] = await connection.execute(
+          `UPDATE users SET ${setClause} WHERE id = ?`,
+          [...Object.values(newData), id]
+      );
+
+      // Release the connection back to the pool
+      connection.release();
+
+      if (result.affectedRows > 0) {
+          res.json({ message: `User with id ${id} updated successfully` });
+      } else {
+          res.status(404).json({ error: `User with id ${id} not found` });
+      }
+  } catch (error) {
+      console.error('Error updating user data in MySQL:', error);
+      res.status(500).send('Internal Server Error');
+  }
+});
+
+
 module.exports = router;

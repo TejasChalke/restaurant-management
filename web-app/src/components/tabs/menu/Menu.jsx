@@ -105,7 +105,6 @@ export default function Menu(){
             
           
             if (response.status < 200 || response.status > 299) {
-              // If the response status is not in the range 200-299
               console.log(`Error updating menu values inside the database. Status: ${response.status}`);
             } else {
               console.log("Menu values updated successfully");
