@@ -1,0 +1,106 @@
+#menuContainer{
+    #menuList{
+        width: 100%;
+        padding: 2rem 1rem;
+        padding-bottom: 4rem;
+        display: grid;
+        grid-template-columns: 1fr;
+        place-items: center;
+
+        .menuItem{
+            width: 90%;
+            list-style-type: none;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--dark-blue);
+            padding-bottom: 1rem;
+
+            .menuItemHeader{
+                width: 100%;
+                position: relative;
+                border-radius: 4px;
+                
+                img{
+                    width: 100%;
+                    aspect-ratio: 16/10;
+                    object-fit: cover;
+                    border-radius: inherit;
+                    filter: brightness(80%);
+                }
+
+                .menuItemHeader-text{
+                    position: absolute;
+                    bottom: .5rem;
+                    left: .5rem;
+
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: baseline;
+
+                    .big{
+                        font-size: 2rem;
+                        font-weight: 600;
+                        color: white;
+                    }
+
+                    .medium{
+                        font-size: 1.4rem;
+                        font-weight: 600;
+                        color: white;
+                        margin-left: .5rem;
+                    }
+                }
+            }
+
+            .menuItemText{
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: flex-start;
+
+                span {
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+
+                    i{
+                        transform: rotateZ(0deg);
+                        margin-left: .5rem;
+                        font-size: 1.2rem;
+                        transition: transform 200ms linear;
+                    }
+                }
+                
+                .small{
+                    font-size: .8rem;
+                    display: none;
+                }
+
+                &.active{
+                    i{
+                        transform: rotateZ(180deg);
+                    }
+
+                    .small{
+                        display: block;
+                    }
+                }
+            }
+
+            .menuItemButtons{
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                margin-top: .5rem;
+
+                .button{
+                    margin-right: 1rem;
+                    font-size: 1.5rem;
+                    color: white;
+                    background-color: var(--primary-blue);
+                    padding: .25rem 1.5rem;
+                    border-radius: 4px;
+                }
+            }
+        }
+    }
+}

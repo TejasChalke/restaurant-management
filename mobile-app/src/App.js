@@ -7,6 +7,7 @@ import Cart from './pages/cart/Cart'
 import Reservations from './pages/reservations/Reservations'
 import { UserDataContext } from './contexts/UserDataContext';
 import { useState } from 'react';
+import { MenuItemsContext } from './contexts/MenuItemsContext';
 
 function App() {
   const [userData, setUserData] = useState({
@@ -16,10 +17,13 @@ function App() {
     email: "",
     address: ""
   })
+  const [menuItems, setMenuItems] = useState([])
 
   return (
       <div className="App">
         <UserDataContext.Provider value={{userData, setUserData}}>
+        <MenuItemsContext.Provider value={{menuItems, setMenuItems}}>
+
           <BrowserRouter>
             <Routes>
                 <Route element={<Logon />} path='/' index/>
@@ -29,6 +33,8 @@ function App() {
                 <Route element={<Profile />} path='/profile'/>
             </Routes>
           </BrowserRouter>
+          
+        </MenuItemsContext.Provider>
         </UserDataContext.Provider>
       </div>
   );

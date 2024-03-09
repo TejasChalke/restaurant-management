@@ -1,7 +1,9 @@
 import { useContext, useRef, useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import './Logon.scss'
+import DB from '../../common functions/Database'
 import { UserDataContext } from '../../contexts/UserDataContext';
+import { MenuItemsContext } from '../../contexts/MenuItemsContext';
 
 // load environment variables from .env file
 const SERVER_ADDRESS = process.env.REACT_APP_SERVER_ADDRESS;
@@ -27,7 +29,8 @@ export default function Logon(){
 }
 
 function Login(props){
-    const {setUserData} = useContext(UserDataContext);
+    const { setUserData } = useContext(UserDataContext);
+    const { setMenuItems } = useContext(MenuItemsContext);
     const navigate = useNavigate();
     const emailRef = useRef();
     const passwordRef = useRef();
@@ -58,6 +61,10 @@ function Login(props){
 
                 const result = await response.json();
                 setUserData(result[0]);
+
+                const availMenuItems = await DB.getAvailableMenuItems();
+                setMenuItems(availMenuItems);
+                
                 navigate("/profile");
             }
         }catch (error){
