@@ -7,6 +7,7 @@ import { MenuItemsContext } from '../../contexts/MenuItemsContext';
 
 // load environment variables from .env file
 const SERVER_ADDRESS = process.env.REACT_APP_SERVER_ADDRESS;
+const LOCAL_STORAGE_ALIAS = process.env.REACT_APP_LOCAL_STORAGE_ALIAS;
 
 export default function Logon(){
     const [page, setPage] = useState("login")
@@ -59,13 +60,43 @@ function Login(props){
             } else {
                 console.log("User details retreived");
 
-                const result = await response.json();
-                setUserData(result[0]);
+                const result = (await response.json())[0];
+                setUserData(result);
 
                 const availMenuItems = await DB.getAvailableMenuItems();
-                setMenuItems(availMenuItems);
+                setMenuItems(availMenuItems.map((item) => {
+                    return {...item, added: false}
+                }));
                 
-                navigate("/profile");
+                if(localStorage.getItem(LOCAL_STORAGE_ALIAS) === null)
+                    localStorage.setItem(LOCAL_STORAGE_ALIAS, JSON.stringify({users:[]}));
+
+                let tempStorage = JSON.parse(localStorage.getItem(LOCAL_STORAGE_ALIAS));
+                let storageUsers = tempStorage.users;
+                let hasUser = false;
+
+                for(let user of storageUsers){
+                    if(user.id === result.id) {
+                        hasUser = true;
+                        break;
+                    }
+                }
+
+                if(!hasUser) {
+                    storageUsers.push({
+                        id: result.id,
+                        cartItems: []
+                    });
+                }
+
+                tempStorage.users = storageUsers;
+                localStorage.setItem(LOCAL_STORAGE_ALIAS, JSON.stringify(tempStorage));
+
+                // store the menu items in cache
+                // at each login refresh the cached items
+                // at checkout verify the prices
+                
+                navigate("/menu");
             }
         }catch (error){
             // Network error or other exceptions
