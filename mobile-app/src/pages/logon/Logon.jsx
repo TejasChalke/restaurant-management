@@ -91,10 +91,6 @@ function Login(props){
 
                 tempStorage.users = storageUsers;
                 localStorage.setItem(LOCAL_STORAGE_ALIAS, JSON.stringify(tempStorage));
-
-                // store the menu items in cache
-                // at each login refresh the cached items
-                // at checkout verify the prices
                 
                 navigate("/menu");
             }
