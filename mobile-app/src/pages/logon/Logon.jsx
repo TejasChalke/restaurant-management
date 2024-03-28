@@ -60,8 +60,7 @@ function Login(props){
             } else {
                 console.log("User details retreived");
 
-                const result = (await response.json())[0];
-                setUserData(result);
+                const result = await response.json();
 
                 const availMenuItems = await DB.getAvailableMenuItems();
                 setMenuItems(availMenuItems.map((item) => {
@@ -85,13 +84,16 @@ function Login(props){
                 if(!hasUser) {
                     storageUsers.push({
                         id: result.id,
-                        cartItems: []
+                        cartItems: [],
+                        accessToken: result.accessToken
                     });
                 }
 
                 tempStorage.users = storageUsers;
                 localStorage.setItem(LOCAL_STORAGE_ALIAS, JSON.stringify(tempStorage));
                 
+                delete result.accessToken
+                setUserData(result);
                 navigate("/menu");
             }
         }catch (error){

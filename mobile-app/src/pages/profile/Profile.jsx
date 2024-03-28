@@ -5,6 +5,7 @@ import { UserDataContext } from '../../contexts/UserDataContext';
 
 // load environment variables from .env file
 const SERVER_ADDRESS = process.env.REACT_APP_SERVER_ADDRESS;
+const LOCAL_STORAGE_ALIAS = process.env.REACT_APP_LOCAL_STORAGE_ALIAS;
 
 export default function Profile(){
     const [editTitle, setEditTitle] = useState("field");
@@ -19,10 +20,15 @@ export default function Profile(){
         }
 
         try {
+            const tempStorage = JSON.parse(localStorage.getItem(LOCAL_STORAGE_ALIAS));
+            const storageUsers = tempStorage.users;
+            const accessToken = storageUsers.filter(user => user.id === userData.id)[0].accessToken
+
             const response = await fetch(SERVER_ADDRESS + "/user/update-user", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`
                 },
                 body: JSON.stringify(userData),
             })
@@ -47,10 +53,11 @@ export default function Profile(){
         if(address.length < 10) return false;
         if(name.length < 4) return false;
         if(contact.length !== 10) return false;
-
-        for(let i=0; i<contact.length; i++)
+        
+        for(let i=0; i<contact.length; i++){
             if(contact[i] < '0' || contact[i] > '9') return false;
-
+        }
+        
         return validateEmail(email);
     }
 
@@ -59,11 +66,6 @@ export default function Profile(){
         const atLastIndex = email.lastIndexOf('@');
         const dotIndex = email.lastIndexOf('.');
 
-        // ignore the forward slash warning
-        // eslint-disable-next-line
-        const format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-
-        if(email.match(format)) return false;
         if(atIndex === -1 || atIndex !== atLastIndex) return false;
         if(atIndex < 4 || dotIndex < atIndex || dotIndex - atIndex < 3) return false;
         return true;

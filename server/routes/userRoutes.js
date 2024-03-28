@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql2/promise');
+const { getAccessToken, authenticateToken } = require('../server_modules/auth');
 
 // load environment variables from .env file
 require('dotenv').config();
@@ -28,12 +29,15 @@ router.post('/login', async (req, res) => {
             'SELECT id, name, contact, email, address FROM users where email = ? AND password = ?',
             [email, password] 
         );
+        
+        const userToken = getAccessToken({name: rows[0].name, id: rows[0].id})
+        const userData = {...rows[0], accessToken: userToken}
 
         // Release the connection back to the pool
         connection.release();
 
         // Send the retrieved data in the response
-        res.json(rows);
+        res.json(userData);
     } catch (error) {
         console.error('Error retrieving data from MySQL:', error);
         res.status(500).send('Internal Server Error');
@@ -70,7 +74,7 @@ router.post('/signup', async (req, res) => {
 
   
 // API route to update menu item data in MySQL table
-router.put('/update-user', async (req, res) => {
+router.put('/update-user', authenticateToken, async (req, res) => {
   const newData = req.body;
 
   // Check if 'id' is present in the request body
