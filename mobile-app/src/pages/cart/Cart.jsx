@@ -8,6 +8,8 @@ const LOCAL_STORAGE_ALIAS = process.env.REACT_APP_LOCAL_STORAGE_ALIAS;
 
 export default function Cart(){
     const [cartItems, setCartItems] = useState([]);
+    const [orderContact, setOrderContact] = useState("");
+    const [displayForm, setDisplayForm] = useState(false);
     const { userData } = useContext(UserDataContext);
 
     useEffect(() => {
@@ -57,6 +59,73 @@ export default function Cart(){
         setCartItems(users[userIndex].cartItems);
     }
 
+    function placeOrder(){
+        if(userData.address.trim().length < 10) {
+            console.log("Enter a valid address");
+            return;
+        }
+        
+        setOrderContact("");
+        setDisplayForm(true);
+    }
+
+    function cancelConfirmation() {
+        setOrderContact("");
+        setDisplayForm(false);
+    }
+
+    function confirmOrder() {
+        let deliveryContact = userData.contact;
+        if(orderContact.trim().length > 0 && orderContact.trim().length !== 10) {
+            console.log("Enter a valid delivery contact");
+            return;
+        }else{
+            deliveryContact = orderContact.trim();
+        }
+        
+        const address = userData.address;
+        const user_id = userData.id;
+        let total = 0;
+        
+        const currenDate = new Date();
+        let orderDate = getFormatedDate(currenDate);
+        let orderTime = getFormatedTime(currenDate);
+
+        
+        let status = "placed";
+
+        const localStorageData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_ALIAS));
+        const users = localStorageData.users;
+
+        users.filter(user => user.id === user_id)[0].cartItems.forEach(item => {
+            total += item.itemPrice
+        })
+
+        console.log(total + ", " + orderDate + ", " + orderTime);
+    }
+
+    function getFormatedDate(currenDate) {
+        let month = currenDate.getMonth() + 1;
+        if(month < 10) month = '0' + month;
+        let date = currenDate.getDate();
+        if(date < 10) date = '0' + date;
+
+        return currenDate.getFullYear() + "-" + month + "-" + date;
+    }
+
+    function getFormatedTime(currenDate) {
+        let hours = currenDate.getHours();
+        if(hours < 10) hours = '0' + hours;
+        let minutes = currenDate.getMinutes();
+        if(minutes < 10) minutes = '0' + minutes;
+        let seconds = currenDate.getSeconds();
+        if(seconds < 10) seconds = '0' + seconds;
+
+        return hours + ":" + minutes + ":" + seconds;
+    }
+
+    const confirmationFormClassname = displayForm ? "active" : "";
+
     function clearCart(){
         const localStorageData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_ALIAS));
         let users = localStorageData.users, userIndex = 0;
@@ -105,10 +174,18 @@ export default function Cart(){
             {
                 cartItems.length > 0 &&
                 <div id="cartButtons">
-                    <div className="cartButton">Submit</div>
+                    <div className="cartButton" onClick={placeOrder}>Submit</div>
                     <div className="cartButton" onClick={clearCart}>Clear</div>
                 </div>
             }
+            <div id="orderConfirmationForm" className={confirmationFormClassname}>
+                <div className="orderConfirmation-text">Use a different number for contact?</div>
+                <input type="text" placeholder='Leave blank if no.' />
+                <div id="orderConfirmationButtons">
+                    <div className="orderConfirmationButton" onClick={confirmOrder}>Confirm</div>
+                    <div className="orderConfirmationButton" onClick={cancelConfirmation}>Cancel</div>
+                </div>
+            </div>
             <Footer tab="cart" />
         </div>
     )
