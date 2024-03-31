@@ -4,6 +4,7 @@ import './Cart.scss'
 import { UserDataContext } from '../../contexts/UserDataContext';
 
 // load environment variables from .env file
+const SERVER_ADDRESS = process.env.REACT_APP_SERVER_ADDRESS;
 const LOCAL_STORAGE_ALIAS = process.env.REACT_APP_LOCAL_STORAGE_ALIAS;
 
 export default function Cart(){
@@ -59,6 +60,23 @@ export default function Cart(){
         setCartItems(users[userIndex].cartItems);
     }
 
+    function clearCart(){
+        const localStorageData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_ALIAS));
+        let users = localStorageData.users, userIndex = 0;
+
+        for (let itr = 0; itr < users.length; itr++) {
+            let element = users[itr];
+            if(element.id === userData.id){
+                userIndex = itr;
+                break;
+            }
+        }
+
+        users[userIndex].cartItems = [];
+        localStorage.setItem(LOCAL_STORAGE_ALIAS, JSON.stringify(localStorageData));
+        setCartItems(users[userIndex].cartItems);
+    }
+
     function placeOrder(){
         if(userData.address.trim().length < 10) {
             console.log("Enter a valid address");
@@ -69,39 +87,75 @@ export default function Cart(){
         setDisplayForm(true);
     }
 
-    function cancelConfirmation() {
+    function closeConfirmation() {
         setOrderContact("");
         setDisplayForm(false);
     }
 
-    function confirmOrder() {
+    async function confirmOrder() {
         let deliveryContact = userData.contact;
         if(orderContact.trim().length > 0 && orderContact.trim().length !== 10) {
             console.log("Enter a valid delivery contact");
             return;
-        }else{
+        }else if(orderContact.trim().length === 10){
             deliveryContact = orderContact.trim();
         }
         
         const address = userData.address;
         const user_id = userData.id;
-        let total = 0;
+        const status = "placed";
         
         const currenDate = new Date();
         let orderDate = getFormatedDate(currenDate);
         let orderTime = getFormatedTime(currenDate);
-
         
-        let status = "placed";
-
         const localStorageData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_ALIAS));
         const users = localStorageData.users;
-
-        users.filter(user => user.id === user_id)[0].cartItems.forEach(item => {
+        
+        let total = 0;
+        const orderItemsIds = users.filter(user => user.id === user_id)[0].cartItems.map(item => {
             total += item.itemPrice
+            return item.itemId
         })
 
-        console.log(total + ", " + orderDate + ", " + orderTime);
+        if(orderItemsIds.length < 1) {
+            console.log("Cart is empty! Add some items.")
+            return
+        }
+
+        const data = {
+            user_id: user_id,
+            total: total,
+            address: address,
+            orderDate: orderDate,
+            orderTime: orderTime,
+            status: status,
+            deliveryContact: deliveryContact,
+            orderItemsIds: orderItemsIds
+        }
+
+        try{
+            const response = await fetch(SERVER_ADDRESS + "/order/add-online-order", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            })
+            
+            if (response.status < 200 || response.status > 299) {
+                // If the response status is not in the range 200-299
+                console.log(`Error adding order to the database. Status: ${response.status}`);
+            } else {
+                console.log("Online order placed.");
+            }
+        }catch (error){
+            // Network error or other exceptions
+            console.error("Error making the API request:", error);
+        }
+
+        closeConfirmation();
+        clearCart();
     }
 
     function getFormatedDate(currenDate) {
@@ -125,23 +179,6 @@ export default function Cart(){
     }
 
     const confirmationFormClassname = displayForm ? "active" : "";
-
-    function clearCart(){
-        const localStorageData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_ALIAS));
-        let users = localStorageData.users, userIndex = 0;
-
-        for (let itr = 0; itr < users.length; itr++) {
-            let element = users[itr];
-            if(element.id === userData.id){
-                userIndex = itr;
-                break;
-            }
-        }
-
-        users[userIndex].cartItems = [];
-        localStorage.setItem(LOCAL_STORAGE_ALIAS, JSON.stringify(localStorageData));
-        setCartItems(users[userIndex].cartItems);
-    }
 
     return(
         <div id="cartContainer">
@@ -183,7 +220,7 @@ export default function Cart(){
                 <input type="text" placeholder='Leave blank if no.' />
                 <div id="orderConfirmationButtons">
                     <div className="orderConfirmationButton" onClick={confirmOrder}>Confirm</div>
-                    <div className="orderConfirmationButton" onClick={cancelConfirmation}>Cancel</div>
+                    <div className="orderConfirmationButton" onClick={closeConfirmation}>Cancel</div>
                 </div>
             </div>
             <Footer tab="cart" />
