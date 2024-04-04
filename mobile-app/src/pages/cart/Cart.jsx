@@ -135,10 +135,15 @@ export default function Cart(){
         }
 
         try{
+            const tempStorage = JSON.parse(localStorage.getItem(LOCAL_STORAGE_ALIAS));
+            const storageUsers = tempStorage.users;
+            const accessToken = storageUsers.filter(user => user.id === userData.id)[0].accessToken;
+
             const response = await fetch(SERVER_ADDRESS + "/order/add-online-order", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`
                 },
                 body: JSON.stringify(data),
             })
