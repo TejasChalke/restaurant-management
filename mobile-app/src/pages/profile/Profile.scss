@@ -8,7 +8,6 @@
         flex-direction: column;
         justify-content: flex-start;
         align-items: flex-start;
-
         padding: 2rem;
 
         .profileOption{
@@ -44,6 +43,67 @@
             cursor: pointer;
             color: white;
             background-color: var(--primary-blue);
+        }
+    }
+
+    #profileOrders{
+        margin: 2rem;
+        margin-top: 0rem;
+        padding-top: 1rem;
+        padding-bottom: 4rem;
+        list-style-type: none;
+        border-top: 1px solid var(--dark-blue);
+
+        #profileOrdersTitle{
+            font-size: 2rem;
+            font-weight: 600;
+            padding-bottom: .5rem;
+            margin-bottom: 1rem;
+        }
+
+        .profileOrderItem{
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            width: 100%;
+            border: 1px solid var(--dark-blue);
+            padding: .5rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+
+            .profileOrderItem-header{
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                font-size: 1.5rem;
+                font-weight: 600;
+
+                border-bottom: 1px solid var(--dark-blue);
+                padding-bottom: .5rem;
+                margin-bottom: .5rem;
+
+                .profileOrderItem-title{                    
+                    i{
+                        margin-left: .5rem;
+                    }
+                }
+            }
+
+            .profileOrderItem-cell{
+                width: 100%;
+                display: grid;
+                grid-template-columns: 40% 1fr;
+                align-items: center;
+                text-transform: capitalize;
+
+                .profileOrderItem-bold{
+                    font-size: 1.2rem;
+                    font-size: 600;
+                }
+            }
         }
     }
 
@@ -99,6 +159,56 @@
                 background-color: var(--primary-blue);
                 cursor: pointer;
             }
+        }
+    }
+
+    #orderDetailsDisplay{
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        
+        width: 90%;
+        height: 50%;
+        z-index: 10;
+        background-color: rgb(64, 109, 116);
+        border-radius: 4px;
+
+        display: none;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 1rem;
+        padding-bottom: 4rem;
+        
+        font-size: 1.2rem;
+        color: white;
+
+        &.active{
+            display: flex;
+        }
+
+        #orderDetailsDisplayTitle{
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: .5rem;
+        }
+        
+        .orderDetailsDisplay-text{
+            width: 100%;
+            display: grid;
+            grid-template-columns: 40% 1fr;
+        }
+
+        #orderDetailsButton{
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            
+            border-radius: 4px;
+            padding: .25rem 1rem;
+            color: white;
+            background-color: var(--primary-blue);
+            cursor: pointer;
         }
     }
 }

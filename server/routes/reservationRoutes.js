@@ -62,15 +62,39 @@ router.post('/user-reservations', authenticateToken, async (req, res) => {
       // Release the connection back to the pool
       connection.release();
   
-      if (result.length > 0) {
-        res.status(200).json(result);
-      } else {
-        res.status(500).json([]);
-      }
+      res.status(200).json(result);
     } catch (error) {
       console.error('Error getting user reservation data from MySQL:', error);
       res.status(500).send('Internal Server Error');
     }
+});
+
+router.delete('/user-reservation', authenticateToken, async (req, res) => {
+  try {
+    // Get a connection from the pool
+    const connection = await pool.getConnection();
+  
+    // Extract data from the POST request body
+    const { id } = req.body;
+
+    // Delete data from the 'reservations' table
+    const [result] = await connection.execute(
+      'Delete FROM reservations where id = ?',
+      [id]
+    );
+
+    // Release the connection back to the pool
+    connection.release();
+
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: 'Reservation deleted successfully' });
+    } else {
+      res.status(200).json({ error: 'Reservation with the ID was not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting user reservation from MySQL:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 module.exports = router;

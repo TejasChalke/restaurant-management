@@ -63,4 +63,88 @@ router.post('/add-online-order', async (req, res) => {
     }
 });
 
+router.post('/all-user-orders', authenticateToken, async (req, res) => {
+    try {
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Extract data from the POST request body
+        const { user_id } = req.body;
+
+        // Add data inside the 'online_orders' table
+        const [result] = await connection.execute(
+            "SELECT id, total, date, time, status FROM online_orders where user_id = ?",
+            [user_id]
+        );
+        
+        res.status(200).json(result);
+    } catch (error) {
+        console.error("Error getting user orders data from MySQL:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+router.post('/user-order', authenticateToken, async (req, res) => {
+    try {
+      // Get a connection from the pool
+      const connection = await pool.getConnection();
+    
+      // Extract data from the POST request body
+      const { id } = req.body;
+
+      // Get data from the 'online_orders' table
+      const [result] = await connection.execute(
+        'Select id, total, address, status, delivery_contact FROM online_orders where id = ?',
+        [id]
+      );
+  
+      // Release the connection back to the pool
+      connection.release();
+  
+      if (result.length > 0) {
+        res.status(200).json(result[0]);
+      } else {
+        res.status(404).json({ error: 'Order with the ID {' + id + '} was not found' });
+      }
+    } catch (error) {
+      console.error('Error getting user order from MySQL:', error);
+      res.status(500).send('Internal Server Error');
+    }
+});
+
+router.delete('/user-order', authenticateToken, async (req, res) => {
+    try {
+      // Get a connection from the pool
+      const connection = await pool.getConnection();
+    
+      // Extract data from the POST request body
+      const { id } = req.body;
+
+      // Delete data from the 'order_items' table
+      const [_] = await connection.execute(
+        'Delete FROM order_items where online_order_id = ?',
+        [id]
+      );
+  
+      // Delete data from the 'online_orders' table
+      const [result] = await connection.execute(
+        'Delete FROM online_orders where id = ?',
+        [id]
+      );
+  
+      // Release the connection back to the pool
+      connection.release();
+  
+      if (result.affectedRows > 0) {
+        res.status(200).json({ message: 'Order deleted successfully' });
+      } else {
+        res.status(200).json({ error: 'Order with the ID {' + id + '} was not found' });
+      }
+    } catch (error) {
+      console.error('Error deleting user Order from MySQL:', error);
+      res.status(500).send('Internal Server Error');
+    }
+});
+  
+
 module.exports = router;

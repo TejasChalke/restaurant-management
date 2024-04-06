@@ -119,9 +119,40 @@ export default function Reservations(){
             console.error("Error making the API request:", error);
         }
     }
+    
+    async function cancelReservation(reservationId) {
+        const data = {
+            id: reservationId
+        }
+
+        try {
+            const tempStorage = JSON.parse(localStorage.getItem(LOCAL_STORAGE_ALIAS));
+            const storageUsers = tempStorage.users;
+            const accessToken = storageUsers.filter(user => user.id === userData.id)[0].accessToken;
+
+            const response = await fetch(SERVER_ADDRESS + "/reservation/user-reservation", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`
+                },
+                body: JSON.stringify(data),
+            });
+            
+            if (response.status < 200 || response.status > 299) {
+                // If the response status is not in the range 200-299
+                console.log(`Error deleting reservation from the database. Status: ${response.status}`);
+            } else {
+                console.log("Reservation deleted.");
+                getReservations();
+            }
+        } catch (error) {
+            // Network error or other exceptions
+            console.error("Error making the API request:", error);
+        }
+    }
 
     const reservationFormClass = showReservationForm ? "active" : "";
-    console.log(reservations);
 
     return(
         <div id="reservationsContainer">
@@ -142,7 +173,7 @@ export default function Reservations(){
                                     <div className="reservationListItem-title">
                                         REID{item.id}
                                     </div>
-                                    <i className="fa-solid fa-ban"></i>
+                                    <i className="fa-solid fa-ban" onClick={() => cancelReservation(item.id)}></i>
                                 </div>
                                 <div className="reservationListItem-cell">
                                     <span className="reservationListItem-bold">Seats</span>
