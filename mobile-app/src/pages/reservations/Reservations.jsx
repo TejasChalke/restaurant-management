@@ -25,7 +25,7 @@ export default function Reservations(){
             const storageUsers = tempStorage.users;
             const accessToken = storageUsers.filter(user => user.id === userData.id)[0].accessToken;
 
-            const response = await fetch(SERVER_ADDRESS + "/reservation/user-reservations", {
+            const response = await fetch(SERVER_ADDRESS + "/reservation/get-user-reservations", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -87,7 +87,8 @@ export default function Reservations(){
             seats: seats,
             time: reservationTime,
             date: reservationDate,
-            user_id: userData.id
+            user_id: userData.id,
+            user_name: userData.name
         }
 
         try {

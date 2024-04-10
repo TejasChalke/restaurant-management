@@ -1,29 +1,63 @@
+import { useCallback } from 'react';
 import './Reservation.scss'
 import { useEffect, useState } from "react"
+
+// load environment variables from .env file
+const SERVER_ADDRESS = process.env.REACT_APP_SERVER_ADDRESS;
 
 export default function Reservation(){
     const [reservations, setReservations] = useState([]);
 
-    useEffect(() => {
-        let temp = [];
-        const currDate = "2024-01-10";
-        const d = new Date();
-        const currHr = d.getHours();
-
-        for(let i=0; i<6; i++){
-            const currTime = currHr + Math.floor(Math.random() * (20 - currHr));
-            const currMin = d.getMinutes() - 6;
-            temp.push({
-                customerName: "John Doe",
-                customerId: Math.random() > 0.4 ? i : 0,
-                dateTime: currDate.split("-").reverse().join("/") + " " + currTime + ":" + (currMin < 10 ? "0" + currMin : currMin),
-                status: (i === 2 || i === 5) ? "pending" : "approved",
-                seats: Math.ceil(Math.random() * 6)
+    const getAllReservations = useCallback(async () => {
+        try {
+            const response = await fetch(SERVER_ADDRESS + "/reservation/all-reservations", {
+                method: "GET"
             })
+
+            if (response.status < 200 || response.status > 299) {
+                // If the response status is not in the range 200-299
+                console.log(`Error while getting requested reservations. Status: ${response.status}`);
+            } else {
+                console.log("User reservations retrieved");
+                setReservations(await response.json());
+            }
+        } catch (error) {
+            // Network error or other exceptions
+            console.error("Error making the API request:", error);
         }
-        
-        setReservations(temp);
-    }, []);
+    }, [])
+
+    useEffect(() => {
+        getAllReservations();
+    }, [getAllReservations]);
+
+    async function updateReservation(reservation_id, new_status) {
+        try {
+            const data = {
+                id: reservation_id,
+                new_status: new_status
+            }
+
+            const response = await fetch(SERVER_ADDRESS + "/reservation/update-user-reservation", {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+
+            if (response.status < 200 || response.status > 299) {
+                // If the response status is not in the range 200-299
+                console.log(`Error while updating reservation. Status: ${response.status}`);
+            } else {
+                console.log("Reservations updated");
+                getAllReservations();
+            }
+        } catch (error) {
+            // Network error or other exceptions
+            console.error("Error making the API request:", error);
+        }
+    }
 
     function removeOldReservations() {
 
@@ -43,17 +77,17 @@ export default function Reservation(){
                 {
                     reservations.map((reservation, idx) => {
                         const currClassName = "reservationItem" + (reservation.customerId !== 0 ? " registered" : "");
-                        const currDateTime = reservation.dateTime.split(" ");
+                        const currDate = reservation.date.split("T")[0];
                         return (
                             <div className={currClassName} key={idx}>
                                 <div className="reservationItem-title">
                                     <div className='reservationItem-header'>
                                         {reservation.customerId !== 0 && <i className="fa-solid fa-user"></i>}
-                                        <span>{reservation.customerName} ({reservation.seats})</span>
+                                        <span>{reservation.user_name} ({reservation.seats})</span>
                                     </div>
                                     <div className='reservationItem-subheader'>
-                                        <span>Date: {currDateTime[0]}</span>
-                                        <span>Time: {currDateTime[1]}</span>
+                                        <span>Date: {currDate}</span>
+                                        <span>Time: {reservation.time}</span>
                                     </div>
                                 </div>
 
@@ -61,17 +95,17 @@ export default function Reservation(){
                                     {
                                         reservation.status !== "approved" &&
                                         <>
-                                            <div className="reservationItem-button">
+                                            <div className="reservationItem-button" onClick={() => updateReservation(reservation.id, "approved")}>
                                                 Approve
                                             </div>
-                                                <div className="reservationItem-button red">
-                                                Delete
+                                                <div className="reservationItem-button red" onClick={() => updateReservation(reservation.id, "rejected")}>
+                                                Reject
                                             </div>
                                         </>
                                     }
                                     {
                                         reservation.status === "approved" &&
-                                        <div className="reservationItem-button red">
+                                        <div className="reservationItem-button red" onClick={() => updateReservation(reservation.id, "cancelled")}>
                                             Cancel
                                         </div>
                                     }
