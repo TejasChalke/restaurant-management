@@ -103,6 +103,7 @@ export default function Cart(){
         
         const address = userData.address;
         const user_id = userData.id;
+        const user_name = userData.name;
         const status = "placed";
         
         const currenDate = new Date();
@@ -113,25 +114,29 @@ export default function Cart(){
         const users = localStorageData.users;
         
         let total = 0;
-        const orderItemsIds = users.filter(user => user.id === user_id)[0].cartItems.map(item => {
-            total += item.itemPrice
-            return item.itemId
-        })
+        const orderItems = users.filter(user => user.id === user_id)[0].cartItems.map(item => {
+            total += item.itemPrice * item.itemQuantity
+            return {
+                id: item.itemId,
+                quantity: item.itemQuantity
+            }
+        });
 
-        if(orderItemsIds.length < 1) {
+        if(orderItems.length < 1) {
             console.log("Cart is empty! Add some items.")
             return
         }
 
         const data = {
             user_id: user_id,
+            user_name: user_name,
             total: total,
             address: address,
             orderDate: orderDate,
             orderTime: orderTime,
             status: status,
             deliveryContact: deliveryContact,
-            orderItemsIds: orderItemsIds
+            orderItems: orderItems
         }
 
         try{

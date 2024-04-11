@@ -23,28 +23,28 @@ router.post('/add-online-order', async (req, res) => {
         const connection = await pool.getConnection();
 
         // Extract data from the POST request body
-        const { user_id, total, address, orderDate, orderTime, status, deliveryContact, orderItemsIds } = req.body;
+        const { user_id, user_name, total, address, orderDate, orderTime, status, deliveryContact, orderItems } = req.body;
 
         // Add data inside the 'online_orders' table
         const [result] = await connection.execute(
-            "INSERT INTO online_orders (user_id, total, address, date, time, status, delivery_contact) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            [user_id, total, address, orderDate, orderTime, status, deliveryContact]
+            "INSERT INTO online_orders (user_id, user_name, total, address, date, time, status, delivery_contact) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [user_id, user_name, total, address, orderDate, orderTime, status, deliveryContact]
         );
 
         // Construct the SQL query dynamically
         let sql = `
-        INSERT INTO order_items (online_order_id, table_order_id, menu_item_id)
+        INSERT INTO order_items (online_order_id, table_order_id, menu_item_id, quantity)
         VALUES 
         `;
 
         // Generate placeholders for the values in the query
-        const placeholders = orderItemsIds.map(() => '(?, ?, ?)').join(', ');
+        const placeholders = orderItems.map(() => '(?, ?, ?, ?)').join(', ');
 
         // Append the placeholders to the SQL query
         sql += placeholders;
 
         // Generate an array of parameters for the query
-        const params = orderItemsIds.flatMap(menu_item_id => [result.insertId, null, menu_item_id]);
+        const params = orderItems.flatMap(item => [result.insertId, null, item.id, item.quantity]);
 
         // Insert the data into the order_items table
         const [orderItemsResult] = await connection.execute(sql, params);
@@ -145,6 +145,62 @@ router.delete('/user-order', authenticateToken, async (req, res) => {
       res.status(500).send('Internal Server Error');
     }
 });
+
+router.get('/all-orders', async (req, res) => {
+  try {
+    // Get a connection from the pool
+    const connection = await pool.getConnection();
+
+    // Delete data from the 'order_items' table
+    const [allOrders] = await connection.execute(
+      'SELECT * FROM online_orders WHERE status <> ?',
+      ['delivered']
+    );
+
+    const resultPromises = allOrders.map(async (order) => {
+      let currObj = {
+        time: order.time,
+        total: order.total,
+        status: order.status,
+        customer: {
+          name: order.user_name,
+          contact: order.delivery_contact,
+          address: order.address
+        },
+        items: []
+      }
+
+      const online_order_id = order.id
+      const [allItems] = await connection.execute(
+        'SELECT order_items.menu_item_id, order_items.quantity, menu_items.name, menu_items.price FROM order_items LEFT JOIN menu_items on order_items.menu_item_id = menu_items.id WHERE online_order_id = ?',
+        [online_order_id]
+      );
+
+      currObj.items = allItems.map((item) => {
+        return {
+          dish: item.name,
+          quantity: item.quantity,
+          price: item.price
+        }
+      });
+
+      return currObj;
+    });
+
+    // Wait for all promises to resolve
+    const result = await Promise.all(resultPromises);
+
+    // Release the connection back to the pool
+    connection.release();
+
+    setTimeout(() => {
+      res.status(200).json(result);
+    }, 100);
+  } catch (error) {
+    console.error('Error getting user orders from MySQL:', error);
+    res.status(500).send('Internal Server Error');
+  }
+})
   
 
 module.exports = router;

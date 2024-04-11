@@ -2,10 +2,10 @@ import { useCallback } from 'react';
 import './Reservation.scss'
 import { useEffect, useState } from "react"
 
-// load environment variables from .env file
-const SERVER_ADDRESS = process.env.REACT_APP_SERVER_ADDRESS;
-
 export default function Reservation(){
+    // load environment variables from .env file
+    const SERVER_ADDRESS = process.env.REACT_APP_SERVER_ADDRESS;
+
     const [reservations, setReservations] = useState([]);
 
     const getAllReservations = useCallback(async () => {
@@ -25,7 +25,7 @@ export default function Reservation(){
             // Network error or other exceptions
             console.error("Error making the API request:", error);
         }
-    }, [])
+    }, [SERVER_ADDRESS])
 
     useEffect(() => {
         getAllReservations();

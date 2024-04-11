@@ -37,6 +37,10 @@
 
             .orderItem-header{
                 @include flex-column;
+
+                .big{
+                    text-transform: capitalize;
+                }
             }
             
             .orderItem-list{
