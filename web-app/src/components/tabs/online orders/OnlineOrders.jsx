@@ -175,12 +175,39 @@ export default function OnlineOrders(){
         getAllOnlineOrders();
     }, [getAllOnlineOrders])
 
-    function acceptOrder(index){
-        setOrders(prev => {
-            var temp = [...prev]
-            temp[index].status = "accepted"
-            return temp
-        })
+    async function updateOrderStatus(index, newStatus){
+        const data = {
+            id: orders[index].id,
+            newStatus: newStatus
+        }
+
+        try {
+            const response = await fetch(SERVER_ADDRESS + "/order/update-order-status", {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.status < 200 || response.status > 299) {
+                // If the response status is not in the range 200-299
+                console.log(`Error while updating order. Status: ${response.status}`);
+            } else {
+                console.log("Order updated successfully");
+                setOrders(prev => {
+                    var temp = [...prev]
+
+                    if(newStatus !== "delivered") temp[index].status = newStatus;
+                    else temp.splice(index, 1);
+                    
+                    return temp
+                })
+            }
+        } catch (error) {
+            // Network error or other exceptions
+            console.error("Error making the API request:", error);
+        }
     }
 
     return(
@@ -222,14 +249,14 @@ export default function OnlineOrders(){
                                                             <span>{item.dish}</span>
                                                             (x {item.quantity})
                                                         </span>
-                                                        <span>{item.price}</span>
+                                                        <span>Rs. {item.price}</span>
                                                     </li>
                                                 )
                                             })
                                         }
                                         <li className='medium'>
                                             <span>Total: </span>
-                                            <span>${order.total}</span>
+                                            <span>Rs. {order.total}</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -237,21 +264,46 @@ export default function OnlineOrders(){
                                     Time: {order.time}
                                 </div>
                                 {
-                                    order.status === "pending" ? 
+                                    order.status === "placed" &&
                                     <div className="orderItem-buttons">
-                                        <div className="orderItem-button" onClick={() => acceptOrder(index)}>
+                                        <div className="orderItem-button" onClick={() => updateOrderStatus(index, "accepted")}>
                                             Accept
                                         </div>
-                                        <div className="orderItem-button red">
+                                        <div className="orderItem-button red" onClick={() => updateOrderStatus(index, "rejected")}>
                                             Reject
                                         </div>
-                                    </div> :
+                                    </div>
+                                }
+                                {
+                                    order.status === "accepted" &&
                                     <div className="orderItem-buttons">
-                                        <div className="orderItem-button">
+                                        <div className="orderItem-button" onClick={() => updateOrderStatus(index, "out")}>
                                             Out for Delivery
                                         </div>
-                                        <div className="orderItem-button red">
+                                        <div className="orderItem-button red" onClick={() => updateOrderStatus(index, "cancelled")}>
                                             Cancel
+                                        </div>
+                                    </div>
+                                }
+                                {
+                                    order.status === "out" &&
+                                    <div className="orderItem-buttons">
+                                        <div className="orderItem-button" onClick={() => updateOrderStatus(index, "delivered")}>
+                                            Delivered
+                                        </div>
+                                        <div className="orderItem-button red" onClick={() => updateOrderStatus(index, "returned")}>
+                                            Returned
+                                        </div>
+                                    </div>
+                                }
+                                {
+                                    (order.status === "rejected" || order.status === "cancelled" || order.status === "returned") &&
+                                    <div className="orderItem-buttons">
+                                        <div className="orderItem-button" onClick={() => updateOrderStatus(index, "placed")}>
+                                            Replace
+                                        </div>
+                                        <div className="orderItem-button red">
+                                            Delete
                                         </div>
                                     </div>
                                 }

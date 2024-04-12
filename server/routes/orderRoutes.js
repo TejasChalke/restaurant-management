@@ -17,6 +17,7 @@ const dbConfig = {
 // create a connection pool
 const pool = mysql.createPool(dbConfig);
 
+// adds a new order
 router.post('/add-online-order', async (req, res) => {
     try {
         // Get a connection from the pool
@@ -63,6 +64,7 @@ router.post('/add-online-order', async (req, res) => {
     }
 });
 
+// retrieves all orders for a specific user
 router.post('/all-user-orders', authenticateToken, async (req, res) => {
     try {
         // Get a connection from the pool
@@ -84,7 +86,8 @@ router.post('/all-user-orders', authenticateToken, async (req, res) => {
     }
 });
 
-router.post('/user-order', authenticateToken, async (req, res) => {
+// retrieves data about a specific user order
+router.post('/user-order-data', authenticateToken, async (req, res) => {
     try {
       // Get a connection from the pool
       const connection = await pool.getConnection();
@@ -112,7 +115,8 @@ router.post('/user-order', authenticateToken, async (req, res) => {
     }
 });
 
-router.delete('/user-order', authenticateToken, async (req, res) => {
+// delete a specific user order
+router.delete('/cancel-user-order', authenticateToken, async (req, res) => {
     try {
       // Get a connection from the pool
       const connection = await pool.getConnection();
@@ -146,6 +150,7 @@ router.delete('/user-order', authenticateToken, async (req, res) => {
     }
 });
 
+// gets all the orders which are not delivered to be displayed on the web app
 router.get('/all-orders', async (req, res) => {
   try {
     // Get a connection from the pool
@@ -159,6 +164,7 @@ router.get('/all-orders', async (req, res) => {
 
     const resultPromises = allOrders.map(async (order) => {
       let currObj = {
+        id: order.id,
         time: order.time,
         total: order.total,
         status: order.status,
@@ -200,7 +206,35 @@ router.get('/all-orders', async (req, res) => {
     console.error('Error getting user orders from MySQL:', error);
     res.status(500).send('Internal Server Error');
   }
-})
+});
+
+// updates the status for a specific order
+router.put('/update-order-status', async (req, res) => {
+  try {
+    // Get a connection from the pool
+    const connection = await pool.getConnection();
   
+    // Extract data from the POST request body
+    const { id, newStatus } = req.body;
+
+    // Get data from the 'online_orders' table
+    const [result] = await connection.execute(
+      'UPDATE online_orders SET status = ? WHERE id = ?',
+      [newStatus, id]
+    );
+
+    // Release the connection back to the pool
+    connection.release();
+
+    if (result.affectedRows > 0) {
+      res.sendStatus(200);
+    } else {
+      res.status(404).json({ error: `Couldn't update order. Order with the ID ${id} was not found` });
+    }
+  } catch (error) {
+    console.error('Error updating order status in MySQL:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 module.exports = router;

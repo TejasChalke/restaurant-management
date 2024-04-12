@@ -146,7 +146,12 @@ export default function Profile(){
         editFieldRef.current.value = "";
     }
 
-    async function cancelOrder(orderId) {
+    async function cancelOrder(index, orderId) {
+        if(orders[index].status !== "placed") {
+            console.log("Cannot cancel this order");
+            return;
+        }
+        
         const data = {
             id: orderId
         }
@@ -156,7 +161,7 @@ export default function Profile(){
             const storageUsers = tempStorage.users;
             const accessToken = storageUsers.filter(user => user.id === userData.id)[0].accessToken;
 
-            const response = await fetch(SERVER_ADDRESS + "/order/user-order", {
+            const response = await fetch(SERVER_ADDRESS + "/order/cancel-user-order", {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -188,7 +193,7 @@ export default function Profile(){
             const storageUsers = tempStorage.users;
             const accessToken = storageUsers.filter(user => user.id === userData.id)[0].accessToken;
 
-            const response = await fetch(SERVER_ADDRESS + "/order/user-order", {
+            const response = await fetch(SERVER_ADDRESS + "/order/user-order-data", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -294,7 +299,7 @@ export default function Profile(){
                                         ORID{item.id}
                                         <i className="fa-solid fa-circle-info" onClick={() => displayDetails(item.id)}></i>
                                     </div>
-                                    <i className="fa-solid fa-ban" onClick={() => cancelOrder(item.id)}></i>
+                                    <i className="fa-solid fa-ban" onClick={() => cancelOrder(index, item.id)}></i>
                                 </div>
                                 <div className="profileOrderItem-cell">
                                     <span className="profileOrderItem-bold">Status</span>
