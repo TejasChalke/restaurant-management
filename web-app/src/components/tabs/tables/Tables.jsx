@@ -1,20 +1,26 @@
 import './Tables.scss'
 import { useEffect, useState } from "react"
 
-export default function Tables(){
+export default function Tables() {
     const [tables, setTables] = useState([]);
+    const [searchText, setSearchText] = useState("");
+    const [searchedItems, setSearchedItems] = useState([]);
+
+    useEffect(() => {
+        let debounce = setTimeout(() => {
+            console.log(searchText + " test");
+            setSearchedItems([])
+        }, 1500);
+
+        return () => {
+            clearTimeout(debounce)
+        }
+    }, [searchText]);
 
     useEffect(() => {
         let temp = localStorage.getItem("tableData");
         if(temp === null || temp === undefined || temp.length === 0) {
             temp = [];
-            for(let i=0; i<10; i++){
-                temp.push({
-                    number: i+1,
-                    capacity: 4,
-                    state: "available"
-                })
-            }
             localStorage.setItem("tableData", JSON.stringify(temp));
         } else {
             temp = JSON.parse(temp);
@@ -52,6 +58,12 @@ export default function Tables(){
         localStorage.setItem("tableData", JSON.stringify(temp));
     }
 
+    // function removeTable(index) {
+    //     let tables = JSON.parse(localStorage.getItem("tableData"));
+    //     tables.splice(index, 1);
+    //     changeTableDataInLocalStorage(tables);
+    // }
+
     return(
         <div id="tablesContainer">
             <div className="tabTitle">
@@ -70,7 +82,7 @@ export default function Tables(){
                             <div className={currClassName} key={idx}>
                                 <div className="tableItem-title">
                                     <span>Table {table.number} {currState}</span>
-                                    <i className="fa-solid fa-pen-to-square"></i>
+                                    {/* <i className="fa-solid fa-trash" onClick={() => removeTable(idx)}></i> */}
                                 </div>
                                 <span>Table for: {table.capacity}</span>
 
@@ -123,6 +135,36 @@ export default function Tables(){
                         )
                     })
                 }
+            </div>
+            <div id="tableEditForm">
+                <div id="tableEditFormSearch">
+                    <
+                        input 
+                        type="text" 
+                        placeholder='Enter the dish name'
+                        value={searchText} 
+                        onChange={e => setSearchText(e.target.value)}
+                    />
+                    <ul id="tableEditFormSearch-list">
+                        {
+                            searchedItems.map((item, index) => {
+                                return (
+                                    <li className='tableEditFormSearch-listItem'>
+                                        {item.name}
+                                    </li>
+                                )
+                            })
+                        }
+                    </ul>
+                </div>
+                <div id="tableEditForm-displayList">
+                    {/* display the added items */}
+                </div>
+                <div id="tableEditFormSearch-buttons">
+                    <div className="tableEditFormSearch-button">Bill</div>
+                    <div className="tableEditFormSearch-button">Save</div>
+                    <div className="tableEditFormSearch-button">Close</div>
+                </div>
             </div>
         </div>
     )
