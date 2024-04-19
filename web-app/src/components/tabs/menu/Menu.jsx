@@ -87,6 +87,9 @@ import { useState } from "react"
 // ]
   
 export default function Menu(){
+    // load environment variables from .env file
+    const SERVER_ADDRESS = process.env.REACT_APP_SERVER_ADDRESS;
+
     const [dishes, setDishes] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [fieldsSet, setFieldsSet] = useState({status: false, index: -1});
@@ -95,7 +98,7 @@ export default function Menu(){
     async function updateDishesData(newData){
         var updateStatus = "failed"
         try {
-            const response = await fetch('http://localhost:4300/menu/update-menu', {
+            const response = await fetch(SERVER_ADDRESS + '/menu/update-menu', {
               method: "PUT",
               headers: {
                 "Content-Type": "application/json",
@@ -122,12 +125,12 @@ export default function Menu(){
 
     // function call to get disher data from api
     async function getDishesData(){
-        const respone = await fetch('http://localhost:4300/menu/get-menu')
+        const respone = await fetch(SERVER_ADDRESS + '/menu/get-menu')
         const result = await respone.json()
         setDishes(result); 
     }
     // memoizing the funciton call
-    const memoizedGetDishesData = useCallback(getDishesData, []);
+    const memoizedGetDishesData = useCallback(getDishesData, [SERVER_ADDRESS]);
 
     // setting the data for menu items
     useEffect(() => {

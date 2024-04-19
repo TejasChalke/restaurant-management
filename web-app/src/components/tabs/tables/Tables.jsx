@@ -1,21 +1,44 @@
 import './Tables.scss'
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 export default function Tables() {
+    // load environment variables from .env file
+    const SERVER_ADDRESS = process.env.REACT_APP_SERVER_ADDRESS;
+
     const [tables, setTables] = useState([]);
     const [searchText, setSearchText] = useState("");
     const [searchedItems, setSearchedItems] = useState([]);
+    const [editTableIndex, setEditTableIndex] = useState(-1);
+
+    const getSearchItems = useCallback(async (searchItem) => {
+        try {
+            const response = await fetch(SERVER_ADDRESS + `/menu/search?searchItem=${searchItem}`);
+
+            if(response.status < 200 || response.status > 299) {
+                console.log("Error getting items after searching. Error: " + response.status)
+            } else {
+                console.log("Search items retrieved successfully.")
+                const result = await response.json();
+                setSearchedItems(result);
+            }
+        } catch (error) {
+            console.log("Error making api request.")
+        }
+    }, [SERVER_ADDRESS])
 
     useEffect(() => {
         let debounce = setTimeout(() => {
-            console.log(searchText + " test");
-            setSearchedItems([])
+            if(searchText.trim().length > 0) {
+                getSearchItems(searchText.trim())
+            } else {
+                setSearchedItems([])
+            }
         }, 1500);
 
         return () => {
             clearTimeout(debounce)
         }
-    }, [searchText]);
+    }, [searchText, getSearchItems]);
 
     useEffect(() => {
         let temp = localStorage.getItem("tableData");
@@ -110,6 +133,7 @@ export default function Tables() {
                                         <>
                                             <div
                                                 className="button"
+                                                onClick={() => setEditTableIndex(idx)}
                                             >Edit Items</div>
                                             <div
                                                 className="button"
@@ -136,36 +160,56 @@ export default function Tables() {
                     })
                 }
             </div>
-            <div id="tableEditForm">
-                <div id="tableEditFormSearch">
-                    <
-                        input 
-                        type="text" 
-                        placeholder='Enter the dish name'
-                        value={searchText} 
-                        onChange={e => setSearchText(e.target.value)}
-                    />
-                    <ul id="tableEditFormSearch-list">
-                        {
-                            searchedItems.map((item, index) => {
-                                return (
-                                    <li className='tableEditFormSearch-listItem'>
-                                        {item.name}
+
+            {
+                editTableIndex !== -1 &&
+                <div id="tableEditForm">
+                    <div id="tableEditFormHeader">
+                        <div id="tableEditFormHeader-info">
+                            Edit data for Table {editTableIndex + 1}
+                        </div>
+                        <div id="tableEditFormHeaderSearch">
+                            <
+                                input 
+                                type="text" 
+                                placeholder='Enter the dish name'
+                                value={searchText} 
+                                onChange={e => setSearchText(e.target.value)}
+                            />
+                            <ul id="tableEditFormSearchList">
+                                {
+                                    searchedItems.map((item, index) => {
+                                        return (
+                                            <li className='tableEditFormSearchList-item' key={index}>
+                                                <span>
+                                                    {item.name} (Rs. {item.price})
+                                                </span>
+                                                <div className="tableEditFormSearchList-item-button">
+                                                    Add
+                                                </div>
+                                            </li>
+                                        )
+                                    })
+                                }
+                                {
+                                    searchText.trim().length > 0 && searchedItems.length === 0 &&
+                                    <li className='tableEditFormSearchList-item'>
+                                        No Dishes Found!
                                     </li>
-                                )
-                            })
-                        }
-                    </ul>
+                                }
+                            </ul>
+                        </div>
+                        <div id="tableEditFormSearchButtons">
+                            <div className="tableEditFormSearch-button">Bill</div>
+                            <div className="tableEditFormSearch-button">Save</div>
+                            <div className="tableEditFormSearch-button" onClick={() => setEditTableIndex(-1)}>Close</div>
+                        </div>
+                    </div>
+                    <div id="tableEditForm-displayList">
+                        {/* display the added items */}
+                    </div>
                 </div>
-                <div id="tableEditForm-displayList">
-                    {/* display the added items */}
-                </div>
-                <div id="tableEditFormSearch-buttons">
-                    <div className="tableEditFormSearch-button">Bill</div>
-                    <div className="tableEditFormSearch-button">Save</div>
-                    <div className="tableEditFormSearch-button">Close</div>
-                </div>
-            </div>
+            }
         </div>
     )
 }

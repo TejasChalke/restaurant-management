@@ -55,6 +55,28 @@ router.get('/get-available-menu', async (req, res) => {
     }
 });
 
+// get data as per the searchItem
+router.get('/search', async (req, res) => {
+    try {
+        const searchItem = req.query.searchItem;
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Query the MySQL table
+        const [rows] = await connection.execute(`SELECT id, name, price FROM menu_items where name like '%${searchItem}%'`);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Send the retrieved data in the response
+        res.json(rows);
+    } catch (error) {
+        console.error('Error retrieving data from MySQL:', error);
+        res.status(500).send('Internal Server Error');
+    }
+})
+
 // API route to update menu item data in MySQL table
 router.put('/update-menu', authenticateToken, async (req, res) => {
     const newData = req.body;

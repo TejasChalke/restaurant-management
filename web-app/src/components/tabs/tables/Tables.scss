@@ -9,6 +9,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
+    position: relative;
 
     #tablesGrid{
         width: 100%;
@@ -85,6 +86,95 @@
                 
                 i {
                     color: var(--color-pink);
+                }
+            }
+        }
+    }
+
+    #tableEditForm{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -60%);
+
+        height: 60%;
+        width: 80%;
+
+        background-color: white;
+        @include box-shadow;
+        border-radius: 4px;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 1rem;
+
+        #tableEditFormHeader {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 30%;
+            gap: .5rem;
+
+            #tableEditFormHeader-info{
+                grid-column: span 2;
+                font-size: 1.5rem;
+            }
+
+            #tableEditFormHeaderSearch{
+                position: relative;
+                
+                input {
+                    width: 100%;
+                    font-size: 1.2rem;
+                    padding: .5rem .75rem;
+                }
+
+                #tableEditFormSearchList{
+                    width: 100%;
+                    position: absolute;
+                    list-style-type: none;
+                    top: 100%;
+                    background-color: rgb(219, 219, 219);
+                    border-radius: 4px;
+
+                    .tableEditFormSearchList-item{
+                        width: 100%;
+                        display: flex;
+                        padding: 0rem 1rem;
+                        margin-top: .5rem;
+                        justify-content: space-between;
+                        align-items: center;
+
+                        .tableEditFormSearchList-item-button{
+                            cursor: pointer;
+                            background-color: var(--color-green);
+                            color: white;
+                            padding: .25rem .75rem;
+                            border-radius: 4px;
+                        }
+                    }
+
+                    .tableEditFormSearchList-item:last-child {
+                        margin-bottom: .5rem;
+                    }
+                }
+            }
+
+            #tableEditFormSearchButtons{
+                display: flex;
+                justify-content: space-evenly;
+                align-items: center;
+
+                .tableEditFormSearch-button{
+                    width: 100%;
+                    border-radius: var(--button-border-radius);
+                    cursor: pointer;
+                    text-align: center;
+                    margin-left: .5rem;
+                    padding: .5rem .75rem;
+                    background-color: var(--bg-secondary);
+                    color: white;
                 }
             }
         }
