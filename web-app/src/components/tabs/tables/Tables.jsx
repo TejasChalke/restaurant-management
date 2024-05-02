@@ -41,16 +41,28 @@ export default function Tables() {
     }, [searchText, getSearchItems]);
 
     useEffect(() => {
+        updateTableData();
+    }, []);
+
+    function updateTableData() {
         let temp = localStorage.getItem("tableData");
         if(temp === null || temp === undefined || temp.length === 0) {
             temp = [];
+            for (let index = 0; index < 12; index++) {
+                temp.push({
+                    number: index + 1,
+                    capacity: 4,
+                    state: "available",
+                    items: []
+                })
+            }
             localStorage.setItem("tableData", JSON.stringify(temp));
         } else {
             temp = JSON.parse(temp);
         }
 
         setTables(temp);
-    }, []);
+    }
 
     function capitalize(str){
         return str[0].toUpperCase() + str.substring(1, str.length)
@@ -69,7 +81,8 @@ export default function Tables() {
         temp.push({
             number: tables.length + 1,
             capacity: 4,
-            state: "available"
+            state: "available",
+            items: []
         })
 
         setTables(temp);
@@ -79,6 +92,112 @@ export default function Tables() {
     function changeTableDataInLocalStorage(temp){
         if(temp === null || temp === undefined || temp.length === 0) return;
         localStorage.setItem("tableData", JSON.stringify(temp));
+    }
+
+    function addItemToList(newItem) {
+        let localData = JSON.parse(localStorage.getItem("tableData"));
+        let currTable = localData[editTableIndex];
+        if(currTable.items === null || currTable.items === undefined) currTable.items = [];
+
+        for(let item in currTable.items) {
+            if(item.id === newItem.id) {
+                setSearchText("");
+                return;
+            }
+        }
+
+        currTable.items.push({...newItem, quantity: 1});
+        changeTableDataInLocalStorage(localData);
+        setSearchText("");
+        updateTableData();
+    }
+
+    function changeQuantity(id, change) {
+        let localData = JSON.parse(localStorage.getItem("tableData"));
+        let currTable = localData[editTableIndex];
+
+        for (let index = 0; index < currTable.items.length; index++) {
+            const element = currTable.items[index];
+            if(element.id === id) {
+                element.quantity += change;
+                if(element.quantity === 0) currTable.items.splice(index, 1);
+                break;
+            }
+        }
+
+        changeTableDataInLocalStorage(localData);
+        setSearchText("");
+        updateTableData();
+    }
+
+    async function addToDatabase() {
+        const currenDate = new Date();
+        let orderDate = getFormatedDate(currenDate);
+        let orderTime = getFormatedTime(currenDate);
+        
+        let localData = JSON.parse(localStorage.getItem("tableData"));
+        let currTable = localData[editTableIndex];
+        
+        let total = 0;
+        let orderItems = [];
+
+        currTable.items.forEach(foodItem => {
+            orderItems.push({id: foodItem.id, quantity: foodItem.quantity});
+            total += foodItem.price * foodItem.quantity;
+        });
+
+        let data = {
+            total: total,
+            seats: currTable.capacity,
+            orderDate: orderDate,
+            orderTime: orderTime,
+            orderItems: orderItems
+        }
+
+        try{
+            const response = await fetch(SERVER_ADDRESS + "/order/add-table-order", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            })
+            
+            if (response.status < 200 || response.status > 299) {
+                // If the response status is not in the range 200-299
+                console.log(`Error adding table order to the database. Status: ${response.status}`);
+            } else {
+                currTable.updated = true;
+                console.log("Table order placed.");
+            }
+        }catch (error){
+            // Network error or other exceptions
+            console.error("Error making the API request:", error);
+        }
+
+        changeTableDataInLocalStorage(localData);
+        setSearchText("");
+        updateTableData();
+    }
+
+    function getFormatedDate(currenDate) {
+        let month = currenDate.getMonth() + 1;
+        if(month < 10) month = '0' + month;
+        let date = currenDate.getDate();
+        if(date < 10) date = '0' + date;
+
+        return currenDate.getFullYear() + "-" + month + "-" + date;
+    }
+
+    function getFormatedTime(currenDate) {
+        let hours = currenDate.getHours();
+        if(hours < 10) hours = '0' + hours;
+        let minutes = currenDate.getMinutes();
+        if(minutes < 10) minutes = '0' + minutes;
+        let seconds = currenDate.getSeconds();
+        if(seconds < 10) seconds = '0' + seconds;
+
+        return hours + ":" + minutes + ":" + seconds;
     }
 
     // function removeTable(index) {
@@ -184,7 +303,7 @@ export default function Tables() {
                                                 <span>
                                                     {item.name} (Rs. {item.price})
                                                 </span>
-                                                <div className="tableEditFormSearchList-item-button">
+                                                <div className="tableEditFormSearchList-item-button" onClick={()=>addItemToList(item)}>
                                                     Add
                                                 </div>
                                             </li>
@@ -200,14 +319,31 @@ export default function Tables() {
                             </ul>
                         </div>
                         <div id="tableEditFormSearchButtons">
-                            <div className="tableEditFormSearch-button">Bill</div>
-                            <div className="tableEditFormSearch-button">Save</div>
+                            {
+                                tables[editTableIndex].updated ?
+                                <div className="tableEditFormSearch-button">Bill</div> : 
+                                <div className="tableEditFormSearch-button" onClick={addToDatabase}>Save</div>
+                            }
                             <div className="tableEditFormSearch-button" onClick={() => setEditTableIndex(-1)}>Close</div>
                         </div>
                     </div>
-                    <div id="tableEditForm-displayList">
-                        {/* display the added items */}
-                    </div>
+                    <ul id="tableEditForm-displayList">
+                        {
+                            editTableIndex !== -1 &&
+                            tables[editTableIndex].items.map((foodItem, index) => {
+                                return (
+                                    <li className="tableEditForm-displayList-item" key={index}>
+                                        <div>{foodItem.name}</div>
+                                        <div className='tableEditForm-displayList-item-buttons'>
+                                            <i class="fa-solid fa-minus" onClick={() => changeQuantity(foodItem.id, -1)}></i>
+                                            <span>{foodItem.quantity}</span>
+                                            <i class="fa-solid fa-plus" onClick={() => changeQuantity(foodItem.id, 1)}></i>
+                                        </div>
+                                    </li>
+                                )
+                            })
+                        }
+                    </ul>
                 </div>
             }
         </div>

@@ -178,5 +178,40 @@
                 }
             }
         }
+
+        #tableEditForm-displayList {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            list-style: none;
+
+            padding: 1rem;
+
+            .tableEditForm-displayList-item{
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                margin-bottom: 1rem;
+                font-size: 1.2rem;
+
+                .tableEditForm-displayList-item-buttons{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+
+                    span, i {
+                        margin-left: 1rem;
+                    }
+
+                    i {
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
     }
 }
