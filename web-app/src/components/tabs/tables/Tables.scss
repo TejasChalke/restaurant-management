@@ -214,4 +214,109 @@
             }
         }
     }
+
+    #printReceiptContainer{
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        position: absolute;
+
+        left: 50%;
+        top: 5%;
+        transform: translateX(-50%);
+
+        z-index: 20;
+        height: 80%;
+        width: 60%;
+
+        background-color: white;
+        @include box-shadow;
+        border-radius: 4px;
+
+        padding: 2rem;
+
+        #printReceiptHeader{
+            font-size: 2rem;
+            font-weight: 500;
+            span {
+                margin-left: .5rem;
+            }
+        }
+
+        #printReceiptSubHeader{
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            margin-top: 1rem;
+
+            
+            .printReceiptSubHeader-row{
+                :nth-child(1) {
+                    font-size: 1.2rem;
+                    font-weight: 500;
+                }
+
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        #printReceiptList{
+            list-style-type: none;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+
+            margin-top: 2rem;
+
+            li {
+                width: 100%;
+                display: grid;
+                grid-template-columns: 5% 1fr 20% 25%;
+
+                margin-bottom: .5rem;
+                padding: 0rem .5rem;
+                padding-bottom: .5rem;
+                border-bottom: 1px solid black;
+                
+                :nth-last-child(1) {
+                    text-align: right;
+                }
+                &.big{
+                    font-weight: 500;
+                    font-size: 1.1rem;
+                }
+
+                &.last{
+                    grid-template-columns: 1fr 25%;
+                }
+            }
+        }
+
+        #receiptButtons{
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 2rem;
+
+            #receiptButton {
+                width: max-content;
+                border-radius: var(--button-border-radius);
+                cursor: pointer;
+                text-align: center;
+                margin-left: .5rem;
+                padding: .5rem .75rem;
+                background-color: var(--bg-secondary);
+                color: white;
+            }
+        }
+    }
 }

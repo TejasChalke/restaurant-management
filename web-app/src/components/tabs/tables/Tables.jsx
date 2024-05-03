@@ -9,6 +9,7 @@ export default function Tables() {
     const [searchText, setSearchText] = useState("");
     const [searchedItems, setSearchedItems] = useState([]);
     const [editTableIndex, setEditTableIndex] = useState(-1);
+    const [receiptData, setReceiptData] = useState(null);
 
     const getSearchItems = useCallback(async (searchItem) => {
         try {
@@ -168,6 +169,8 @@ export default function Tables() {
                 console.log(`Error adding table order to the database. Status: ${response.status}`);
             } else {
                 currTable.updated = true;
+                currTable.orderDate = orderDate;
+                currTable.orderTime = orderTime;
                 console.log("Table order placed.");
             }
         }catch (error){
@@ -198,6 +201,14 @@ export default function Tables() {
         if(seconds < 10) seconds = '0' + seconds;
 
         return hours + ":" + minutes + ":" + seconds;
+    }
+
+    function generateBill() {
+        setReceiptData(tables[editTableIndex]);
+    }
+
+    function closeReceipt() {
+        setReceiptData(null);
     }
 
     // function removeTable(index) {
@@ -321,7 +332,7 @@ export default function Tables() {
                         <div id="tableEditFormSearchButtons">
                             {
                                 tables[editTableIndex].updated ?
-                                <div className="tableEditFormSearch-button">Bill</div> : 
+                                <div className="tableEditFormSearch-button" onClick={generateBill}>Bill</div> : 
                                 <div className="tableEditFormSearch-button" onClick={addToDatabase}>Save</div>
                             }
                             <div className="tableEditFormSearch-button" onClick={() => setEditTableIndex(-1)}>Close</div>
@@ -335,9 +346,9 @@ export default function Tables() {
                                     <li className="tableEditForm-displayList-item" key={index}>
                                         <div>{foodItem.name}</div>
                                         <div className='tableEditForm-displayList-item-buttons'>
-                                            <i class="fa-solid fa-minus" onClick={() => changeQuantity(foodItem.id, -1)}></i>
+                                            <i className="fa-solid fa-minus" onClick={() => changeQuantity(foodItem.id, -1)}></i>
                                             <span>{foodItem.quantity}</span>
-                                            <i class="fa-solid fa-plus" onClick={() => changeQuantity(foodItem.id, 1)}></i>
+                                            <i className="fa-solid fa-plus" onClick={() => changeQuantity(foodItem.id, 1)}></i>
                                         </div>
                                     </li>
                                 )
@@ -346,6 +357,77 @@ export default function Tables() {
                     </ul>
                 </div>
             }
+
+            {
+                receiptData !== null &&
+                <PrintReceipt date={receiptData.orderDate} time={receiptData.orderTime} items={receiptData.items} closeReceipt={closeReceipt}/>
+            }
+        </div>
+    )
+}
+
+function PrintReceipt(props) {
+    let total = 0;
+    props.items.forEach(item => total += item.price * item.quantity);
+
+    function generateReceipt() {
+        window.print()
+    }
+
+    return(
+        <div id="printReceiptContainer">
+            <div id="printReceiptHeader">
+                <i className="fa-solid fa-martini-glass-citrus"></i>
+                <span>RESTRO</span>
+            </div>
+            <div id="printReceiptSubHeader">
+                <div className='printReceiptSubHeader-row'>
+                    <span>Time</span>
+                    <span>{props.time}</span>
+                </div>
+                <div className='printReceiptSubHeader-row'>
+                    <span>Date</span>
+                    <span>{props.date}</span>
+                </div>
+                <div className='printReceiptSubHeader-row'>
+                    <span>Contact</span>
+                    <span>+91 95682 12453</span>
+                </div>
+                <div className='printReceiptSubHeader-row'>
+                    <span>Email</span>
+                    <span>restro.help@abc.com</span>
+                </div>
+            </div>
+            <ul id="printReceiptList">
+                <li className='big'>
+                    <span>#</span>
+                    <span>Item</span>
+                    <span>Quantity</span>
+                    <span>Price</span>
+                </li>
+                {
+                    props.items.map((item, index) => {
+                        return(
+                            <li key={index}>
+                                <span>{index+1}</span>
+                                <span>{item.name}</span>
+                                <span>{item.quantity}</span>
+                                <span>Rs. {item.price}</span>
+                            </li>
+                        )
+                    })
+                }
+                <li className="last big">
+                    <span>Total</span>
+                    <span>Rs. {total}</span>
+                </li>
+            </ul>
+
+            <div id="receiptButtons">
+                <div id="receiptButton" onClick={generateReceipt}>Print</div>
+                <div id="receiptButton">Email</div>
+                <div id="receiptButton" onClick={props.closeReceipt}>Close</div>
+            </div>
         </div>
     )
 }
