@@ -285,5 +285,35 @@ router.post('/add-table-order', async (req, res) => {
   }
 });
 
+// Get order time for all online orders
+router.get('/get-online-orders-time-data', async (req, res) => {
+  try {
+      // Get a connection from the pool
+      const connection = await pool.getConnection();
+      
+      const [result] = await connection.execute("SELECT time from online_orders");
+
+      res.json(result);
+  } catch (error) {
+      console.error("Error adding order data to MySQL:", error);
+      res.status(500).send("Internal Server Error");
+  }
+})
+
+// Get order time for all table orders
+router.get('/get-table-orders-time-data', async (req, res) => {
+  try {
+      // Get a connection from the pool
+      const connection = await pool.getConnection();
+      
+      const [result] = await connection.execute("SELECT time from table_orders");
+
+      res.json(result);
+  } catch (error) {
+      console.error("Error adding order data to MySQL:", error);
+      res.status(500).send("Internal Server Error");
+  }
+})
+
 
 module.exports = router;
