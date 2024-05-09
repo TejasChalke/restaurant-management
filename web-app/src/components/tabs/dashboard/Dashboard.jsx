@@ -1,33 +1,68 @@
-import { Line } from 'react-chartjs-2'
-import { Chart as ChartJS, LinearScale, CategoryScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js'
+import { Line, Pie } from 'react-chartjs-2'
+import { Chart as ChartJS, LinearScale, CategoryScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement } from 'chart.js'
 import { useCallback, useState, useEffect } from 'react';
 
-ChartJS.register(LinearScale, CategoryScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(LinearScale, CategoryScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
+
+const backgroundColors = ["#FFC107", "#2196F3", "#4CAF50", "#FF5722", "#9C27B0", "#FF9800", "#03A9F4", "#8BC34A", "#FFEB3B", "#673AB7"];
+const borderColors = ["#b30f04", "#b30436", "#9c6609", "#9c6609", "#306905", "#190569", "#07703b", "#07703b", "#3f065c", "#4b5904"];
 
 export default function Dashboard(){
     // load environment variables from .env file
     const SERVER_ADDRESS = process.env.REACT_APP_SERVER_ADDRESS;
     const [lineData, setLineData] = useState(
         {
-            labels: ["14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00"],
-            datasets: [
-                {
-                    label: "Online Orders",
-                    borderColor: "green",
-                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0]
-                },
-                {
-                    label: "Table Orders",
-                    borderColor: "blue",
-                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0]
-                }
-            ]
+            labels: [],
+            datasets: []
         }
     );
 
+    const [pieData, setPieData] = useState({
+        labels: [],
+        datasets: []
+    });
+
     const options = {};
 
-    const getLineData = useCallback(async () => {
+    async function getPieData() {
+        try {
+            const response = await fetch(SERVER_ADDRESS + "/order/get-menu-items-order-count?limit=8");
+            
+            if (response.status < 200 || response.status > 299) {
+                // If the response status is not in the range 200-299
+                console.log(`Error getting menu items data from database. Status: ${response.status}`);
+            } else {
+                const result = await response.json();
+                
+                let temp = {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: "Menu Items",
+                            data: [],
+                            backgroundColor: [],
+                            borderColor: [],
+                            borderWidth: 1
+                        }
+                    ]
+                }
+
+                result.forEach((obj, index) => {
+                    temp.labels.push(obj["name"]);
+                    temp.datasets[0].data.push(obj["count"]);
+                    temp.datasets[0].backgroundColor.push(backgroundColors[index]);
+                    temp.datasets[0].borderColor.push(borderColors[index]);
+                });
+
+                setPieData(temp);
+            }
+        } catch (error) {
+            // Network error or other exceptions
+            console.error("Error making the API request:", error);
+        }
+    }
+
+    async function getLineData() {
         try {
             let onlineOrderMap = null, tableOrderMap = null
             const response1 = await fetch(SERVER_ADDRESS + "/order/get-online-orders-time-data");
@@ -35,7 +70,7 @@ export default function Dashboard(){
 
             if (response1.status < 200 || response1.status > 299) {
                 // If the response status is not in the range 200-299
-                console.log(`Error getting table order data from database. Status: ${response1.status}`);
+                console.log(`Error getting online order data from database. Status: ${response1.status}`);
             } else {
                 const result = await response1.json();
                 onlineOrderMap = getMap(result);
@@ -48,23 +83,40 @@ export default function Dashboard(){
                 const result = await response2.json();
                 tableOrderMap = getMap(result);
             }
+            
+            let temp = {
+                labels: ["14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00"],
+                datasets: [
+                    {
+                        label: "Online Orders",
+                        borderColor: "green",
+                        data: [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                    },
+                    {
+                        label: "Table Orders",
+                        borderColor: "blue",
+                        data: [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                    }
+                ]
+            };
 
-            setLineData(prev => {
-                let temp = JSON.parse(JSON.stringify(prev));
-                if(onlineOrderMap !== null) temp.datasets[0].data = Object.keys(onlineOrderMap).map(key => onlineOrderMap[key]);
-                if(tableOrderMap !== null) temp.datasets[1].data = Object.keys(tableOrderMap).map(key => tableOrderMap[key]);
-
-                return temp;
-            })
+            if(onlineOrderMap !== null) temp.datasets[0].data = Object.keys(onlineOrderMap).map(key => onlineOrderMap[key]);
+            if(tableOrderMap !== null) temp.datasets[1].data = Object.keys(tableOrderMap).map(key => tableOrderMap[key]);
+            
+            setLineData(temp);
         } catch (error) {
             // Network error or other exceptions
             console.error("Error making the API request:", error);
         }
-    }, [SERVER_ADDRESS]);
+    }
+    
+    const memoizedGetLineData = useCallback(getLineData, [SERVER_ADDRESS]);
+    const memoizedGetPieData = useCallback(getPieData, [SERVER_ADDRESS]);
     
     useEffect(() => {
-        getLineData();
-    }, [getLineData])
+        memoizedGetLineData();
+        memoizedGetPieData();
+    }, [memoizedGetLineData, memoizedGetPieData])
 
     function getMap(result) {
         let currMap = {}
@@ -78,12 +130,17 @@ export default function Dashboard(){
         return currMap
     }
 
-    console.log(lineData);
+    function getData() {
+        console.log("here")
+        getLineData();
+        getPieData();
+    }
 
     return(
         <div id="bashboardContainer">
-            <Line options={options} data={lineData}/>
-            <div onClick={getLineData}>click</div>
+            <div onClick={getData}>click</div>
+            <Line options={options} data={lineData} />
+            <Pie options={options} data={pieData} />
         </div>
     )
 }
