@@ -130,15 +130,14 @@ export default function Dashboard(){
         return currMap
     }
 
-    function getData() {
-        console.log("here")
-        getLineData();
-        getPieData();
-    }
+    // function getData() {
+    //     getLineData();
+    //     getPieData();
+    // }
 
     return(
         <div id="bashboardContainer">
-            <div onClick={getData}>click</div>
+            {/* <div onClick={getData}>click</div>  */}
             <Line options={options} data={lineData} />
             <Pie options={options} data={pieData} />
         </div>

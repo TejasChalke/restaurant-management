@@ -308,6 +308,8 @@ router.get('/get-table-orders-time-data', async (req, res) => {
       
       const [result] = await connection.execute("SELECT time from table_orders");
 
+      connection.release();
+
       res.json(result);
   } catch (error) {
       console.error("Error adding order data to MySQL:", error);
@@ -319,16 +321,18 @@ router.get('/get-menu-items-order-count', async (req, res) => {
   try {
       // Get a connection from the pool
       const connection = await pool.getConnection();
-
+      
       let limit = 10;
       if(req.query.limit !== undefined) {
         limit = req.query.limit;
       }
-      
+        
       const [result] = await connection.execute(
         "SELECT M.name, count(O.menu_item_id) as count FROM order_items as O LEFT JOIN menu_items as M on O.menu_item_id = M.id GROUP BY menu_item_id LIMIT 10",
         [limit]
       );
+
+      connection.release();
 
       res.json(result);
   } catch (error) {
