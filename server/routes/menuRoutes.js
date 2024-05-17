@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql2/promise');
-const { authenticateToken } = require('../server_modules/auth');
 
 // load environment variables from .env file
 require('dotenv').config();
@@ -78,7 +77,7 @@ router.get('/search', async (req, res) => {
 })
 
 // API route to update menu item data in MySQL table
-router.put('/update-menu', authenticateToken, async (req, res) => {
+router.put('/update-menu', async (req, res) => {
     const newData = req.body;
   
     // Check if 'id' is present in the request body

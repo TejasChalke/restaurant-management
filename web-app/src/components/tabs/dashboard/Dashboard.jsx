@@ -1,3 +1,4 @@
+import './Dashboard.scss'
 import { Line, Pie } from 'react-chartjs-2'
 import { Chart as ChartJS, LinearScale, CategoryScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement } from 'chart.js'
 import { useCallback, useState, useEffect } from 'react';
@@ -137,9 +138,17 @@ export default function Dashboard(){
 
     return(
         <div id="bashboardContainer">
-            {/* <div onClick={getData}>click</div>  */}
-            <Line options={options} data={lineData} />
-            <Pie options={options} data={pieData} />
+            <div className="tabTitle">
+                <span>Dashboard</span>
+                <i
+                    className="fa-solid fa-chart-simple"
+                ></i>
+            </div>
+            <div id="bashboardContainer-grid">
+                {/* <div onClick={getData}>click</div>  */}
+                <Line options={options} data={lineData} />
+                <Pie options={options} data={pieData} />
+            </div>
         </div>
     )
 }
